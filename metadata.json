@@ -6,7 +6,7 @@
 
 	"windows": {
 		"icon": "super_toast_8x.png",
-		"lovec": false,
+		"lovec": true,
 		"exeName": "IntersectionSimulation.exe",
 		"extraFiles": null
 	},
