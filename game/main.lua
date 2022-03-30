@@ -9,7 +9,9 @@ ECS.utils.loadNamespace("src/systems", Systems)
 local World = ECS.world()
 
 World:addSystems(
-    Systems.websocketHandler
+    Systems.websocketHandler,
+    Systems.websocketErrorHandler,
+    Systems.messageLogger
 )
 
 ECS.entity(World)
@@ -21,4 +23,8 @@ end
 
 function love.draw()
     World:emit("draw")
+end
+
+function love.quit()
+    World:emit("quit")
 end

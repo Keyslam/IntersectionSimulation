@@ -30,7 +30,7 @@ function WebsocketHandler:onOpen(e)
         eventType = "CONNECT_SIMULATOR",
 
         data = {
-            sessionName = "JustinEnNyk",
+            sessionName = "JustinEnNyk2",
             sessionVersion = 1,
 
             discardParseErrors = false,
@@ -46,19 +46,11 @@ end
 function WebsocketHandler:onMessage(e, message)
     local data = Json.decode(message)
 
-    local handler = self.handlers[data.eventType]
-
-    if (not handler) then
-        print("Received unhandled event type: " .. data.eventType)
-        return
-    end
-
-    handler(self, e, data)
+    self:getWorld():emit("messageReceived", e, message)
+    self:getWorld():emit("MESSAGE_"..data.eventType, e, data.data)
 end
 
-WebsocketHandler.handlers = {}
-
-WebsocketHandler.handlers["SESSION_START"] = function(self, e, data)
+function WebsocketHandler.MESSAGE_SESSION_START(self, e, data)
     print("Session started")
 
     local message = Json.encode({
@@ -70,24 +62,19 @@ WebsocketHandler.handlers["SESSION_START"] = function(self, e, data)
         }
     })
 
+    self:getWorld():emit("messageSent", e, message)
     e.websocket.client:send(message)
 end
 
-WebsocketHandler.handlers["SESSION_STOP"] = function(self, e, data)
+function WebsocketHandler.MESSAGE_SESSION_STOP(self, e, data)
     print("Session ended")
 end
 
-WebsocketHandler.handlers["SET_AUTOMOBILE_ROUTE_STATE"] = function(self, e, data)
+function WebsocketHandler.MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(self, e, data)
     print("Received 'SET_AUTOMOBILE_ROUTE_STATE'")
-    print("RouteID: " .. data.data.routeId)
-    print("State:   " .. data.data.state)
+    print("RouteID: " .. data.routeId)
+    print("State:   " .. data.state)
 
-end
-
-WebsocketHandler.handlers["ERROR_MALFORMED_MESSAGE"] = function(self, e, data)
-    for _, err in ipairs(data.data.errors) do
-        print(err)
-    end
 end
 
 return WebsocketHandler
