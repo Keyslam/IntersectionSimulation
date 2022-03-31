@@ -30,8 +30,8 @@ function WebsocketHandler:onOpen(e)
         eventType = "CONNECT_SIMULATOR",
 
         data = {
-            sessionName = "JustinEnNyk2",
-            sessionVersion = 1,
+            sessionName = e.websocket.sessionName,
+            sessionVersion = e.websocket.sessionVersion,
 
             discardParseErrors = false,
             discardEventTypeErrors = false,
@@ -68,13 +68,6 @@ end
 
 function WebsocketHandler.MESSAGE_SESSION_STOP(self, e, data)
     print("Session ended")
-end
-
-function WebsocketHandler.MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(self, e, data)
-    print("Received 'SET_AUTOMOBILE_ROUTE_STATE'")
-    print("RouteID: " .. data.routeId)
-    print("State:   " .. data.state)
-
 end
 
 return WebsocketHandler

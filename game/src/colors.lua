@@ -16,8 +16,8 @@ local Colors = {
 
     road = {
         red = Color(205, 73, 73),
-        orange = Color(108, 204, 73),
-        green = Color(204, 134, 73),
+        orange = Color(204, 134, 73),
+        green = Color(108, 204, 73),
     }
 }
 

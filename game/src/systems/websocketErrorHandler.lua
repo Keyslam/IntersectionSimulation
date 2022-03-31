@@ -22,7 +22,7 @@ function WebsocketErrorHandler.MESSAGE_ERROR_MALFORMED_MESSAGE(self, e, data)
 end
 
 function WebsocketErrorHandler.MESSAGE_ERROR_INVALID_STATE(self, e, data)
-    print("Error - Invalid state: '"..data.error.."'")
+    print("Error - Invalid state: '"..data.errors.."'")
 end
 
 return WebsocketErrorHandler

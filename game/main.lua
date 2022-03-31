@@ -19,25 +19,27 @@ World:addSystems(
     Systems.websocketErrorHandler,
     Systems.messageLogger,
 
+    Systems.roadHandler,
+
     Systems.roadRenderer,
     Systems.shapeRenderer
 )
 
 ECS.entity(World)
-:assemble(Assemblages.websocketClient, "keyslam.com", 8080)
+:assemble(Assemblages.websocketClient, "keyslam.com", 8080, "JustinEnNyk3")
+
+-- ECS.entity(World)
+-- :assemble(Assemblages.car, {x = 10, y = 10}, 0)
+
+-- ECS.entity(World)
+-- :assemble(Assemblages.pedestrian, {x = 10, y = 20}, 0)
+
+-- ECS.entity(World)
+-- :assemble(Assemblages.bicycle, {x = 10, y = 30}, 0)
 
 ECS.entity(World)
-:assemble(Assemblages.car, {x = 10, y = 10}, 0)
+:assemble(Assemblages.road, {x = 50, y = 50}, {x = 100, y = 75}, "S_HORIZONTAL")
 
-ECS.entity(World)
-:assemble(Assemblages.pedestrian, {x = 10, y = 20}, 0)
-
-ECS.entity(World)
-:assemble(Assemblages.bicycle, {x = 10, y = 30}, 0)
-
-ECS.entity(World)
-:give("curve", 0, 0, 100, 0, 100, 100)
-:give("color", Colors.road.green)
 
 function love.update(dt)
     World:emit("update", dt)
