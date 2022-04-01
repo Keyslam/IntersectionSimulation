@@ -1,8 +1,10 @@
 local Colors = require("src.colors")
 
-return function(e, from, to, kind)
+return function(e, id, from, to, kind)
     e
-    :give("color", Colors.road.normal)
+    :give("color", Colors.road.red)
+    :give("state", "RED")
+    :give("id", id)
 
     if (kind == "TURN_LEFT") then
         e:give("curve", from.x, from.y, from.x, to.y, to.x, to.y)

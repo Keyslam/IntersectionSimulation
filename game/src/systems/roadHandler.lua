@@ -1,15 +1,14 @@
 local Colors = require("src.colors")
 
 local RoadHandler = ECS.system({
-    pool = {"road", "color"}
+    pool = {"color", "state", "id"}
 })
 
 function RoadHandler:init()
     self.idLookup = {}
 
     self.pool.onAdded = function(_, e)
-        self.idLookup[e.road.id] = e
-        print(e.road.id)
+        self.idLookup[e.id.value] = e
     end
 
     self.pool.onRemoved = function(_, e)
@@ -22,17 +21,17 @@ function RoadHandler:init()
     end
 end
 
-function RoadHandler:MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(e, data)
+function RoadHandler:MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(_, data)
     local e = self.idLookup[data.routeId]
 
     if (data.state == "RED") then
-        e.road.state = "RED"
+        e.state.value = "RED"
         e.color.value = Colors.road.red
     elseif (data.state == "ORANGE") then
-        e.road.state = "ORANGE"
+        e.state.value = "ORANGE"
         e.color.value = Colors.road.orange
     elseif (data.state == "GREEN") then
-        e.road.state = "GREEN"
+        e.state.value = "GREEN"
         e.color.value = Colors.road.green
     end
 end

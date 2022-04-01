@@ -1,5 +1,5 @@
 local RoadRenderer = ECS.system({
-    pool = {"curve", "color", "road"}
+    pool = {"curve", "color"}
 })
 
 function RoadRenderer:draw()
