@@ -8,30 +8,26 @@ function RoadHandler:init()
     self.idLookup = {}
 
     self.pool.onAdded = function(_, e)
-        self.idLookup[e.id.value] = e
-    end
-
-    self.pool.onRemoved = function(_, e)
-        for i, oe in pairs(self.idLookup) do
-            if (e == oe) then
-                self.idLookup[i] = nil
-                break
-            end
-        end
+        self:__syncColor(e)
     end
 end
 
 function RoadHandler:MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(_, data)
-    local e = self.idLookup[data.routeId]
+    for _, e in ipairs(self.pool) do
+        if (e.id.value == data.routeId) then
+            e.state.value = data.state
+            self:__syncColor(e)
+        end
+    end
 
-    if (data.state == "RED") then
-        e.state.value = "RED"
+end
+
+function RoadHandler:__syncColor(e)
+    if (e.state.value == "RED") then
         e.color.value = Colors.road.red
-    elseif (data.state == "ORANGE") then
-        e.state.value = "ORANGE"
+    elseif (e.state.value == "ORANGE") then
         e.color.value = Colors.road.orange
-    elseif (data.state == "GREEN") then
-        e.state.value = "GREEN"
+    elseif (e.state.value == "GREEN") then
         e.color.value = Colors.road.green
     end
 end

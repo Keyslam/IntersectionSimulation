@@ -1,8 +1,15 @@
 local Colors = require("src.colors")
 
-return function(e, from, to, kind)
+return function(e, from, to, kind, id)
     e
     :give("color", Colors.road.normal)
+    :give("connection")
+
+    if (id) then
+        e
+        :give("state", "RED")
+        :give("id", id)
+    end
 
     if (kind == "TURN_LEFT") then
         e:give("curve", from.x, from.y, from.x, to.y, to.x, to.y)
@@ -35,5 +42,7 @@ return function(e, from, to, kind)
             halfX, halfY,
             to.x, to.y
         )
+    else
+        error("Unknown curve kind", kind)
     end
 end
