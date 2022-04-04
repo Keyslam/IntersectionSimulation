@@ -31,46 +31,46 @@ ECS.entity(World)
 
 RoadBuilder()
 
-:node("1-start", 550, 190)
-:node("1-end", 450, 190)
-:node("1-post", 400, 190)
+:node("1-start", 550, 240)
+:node("1-end", 450, 240)
+:node("1-post", 400, 240)
 
-:node("2a-start", 550, 200)
-:node("2a-end", 450, 200)
+:node("2a-start", 550, 250)
+:node("2a-end", 450, 250)
 
-:node("2b-start", 550, 210)
-:node("2b-end", 450, 210)
+:node("2b-start", 550, 260)
+:node("2b-end", 450, 260)
 
-:node("3-start", 550, 220)
-:node("3-end", 450, 220)
-:node("3-post", 400, 220)
+:node("3-start", 550, 270)
+:node("3-end", 450, 270)
+:node("3-post", 400, 270)
 
 
-:node("4a-start", 300, 400)
-:node("4a-end", 300, 350)
-:node("4a-post", 300, 300)
+:node("4a-start", 300, 450)
+:node("4a-end", 300, 400)
+:node("4a-post", 300, 350)
 
-:node("4b-start", 310, 400)
-:node("4b-end", 310, 350)
-:node("4b-post", 310, 300)
+:node("4b-start", 310, 450)
+:node("4b-end", 310, 400)
+:node("4b-post", 310, 350)
 
-:node("5-start", 290, 400)
-:node("5-end", 290, 350)
-:node("5-post", 290, 300)
+:node("5-start", 290, 450)
+:node("5-end", 290, 400)
+:node("5-post", 290, 350)
 
-:node("7-start", 0, 280)
-:node("7-end", 100, 280)
-:node("7-post", 180, 280)
+:node("7-start", 0, 330)
+:node("7-end", 100, 330)
+:node("7-post", 180, 330)
 
-:node("8a-start", 0, 260)
-:node("8a-end", 100, 260)
+:node("8a-start", 0, 310)
+:node("8a-end", 100, 310)
 
-:node("8b-start", 0, 270)
-:node("8b-end", 100, 270)
+:node("8b-start", 0, 320)
+:node("8b-end", 100, 320)
 
-:node("9-start", 0, 250)
-:node("9-end", 100, 250)
-:node("9-post", 150, 250)
+:node("9-start", 0, 300)
+:node("9-end", 100, 300)
+:node("9-post", 150, 300)
 
 :node("10-start", 200,   0)
 :node("10-end",   200, 100)
@@ -83,23 +83,23 @@ RoadBuilder()
 :node("12-end", 220, 100)
 :node("12-post", 220, 150)
 
-:node("2-10-start", 150, 200)
-:node("2-10-end",     0, 200)
+:node("2-10-start", 150, 250)
+:node("2-10-end",     0, 250)
 
-:node("1-5-9-start", 300, 100)
+:node("1-5-9-start", 300, 150)
 :node("1-5-9-end", 300, 0)
 
-:node("3-7-11-start", 210, 300)
-:node("3-7-11-end", 210, 400)
+:node("3-7-11-start", 210, 350)
+:node("3-7-11-end", 210, 450)
 
-:node("4a-8a-12-start", 400, 260)
-:node("4a-8a-12-end", 550, 260)
+:node("4a-8a-12-start", 400, 310)
+:node("4a-8a-12-end", 550, 310)
 
-:node("4b-8b-start", 400, 270)
-:node("4b-8b-end", 550, 270)
+:node("4b-8b-start", 400, 320)
+:node("4b-8b-end", 550, 320)
 
-:node("2b-5-start", 150, 210)
-:node("2b-5-end", 0, 210)
+:node("2b-5-start", 150, 260)
+:node("2b-5-end", 0, 260)
 
 
 :edge("1-start", "1-end", "STRAIGHT")
@@ -173,7 +173,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.scale(2, 2)
+    love.graphics.scale(1, 1)
     World:emit("draw")
 end
 
