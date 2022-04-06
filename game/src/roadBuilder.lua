@@ -73,6 +73,15 @@ function RoadBuilder:build(world)
             end
         end
     end
+
+    for road, data in pairs(self.roads) do
+        local from = self.nodes[data.from]
+
+        if (from.isStart) then
+            ECS.entity(world)
+            :assemble(Assemblages.spawner, "CAR", road)
+        end
+    end
 end
 
 return setmetatable(RoadBuilder, {

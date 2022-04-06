@@ -1,5 +1,7 @@
 require("src.debugHandler")
 
+local HC = require("lib.hc")
+
 local RoadBuilder = require("src.roadBuilder")
 local Colors = require("src.colors")
 love.graphics.setBackgroundColor(Colors.background)
@@ -20,66 +22,74 @@ World:addSystems(
     Systems.websocketErrorHandler,
     Systems.messageLogger,
 
+    Systems.roadFollowing,
+    Systems.syncRoadToTransform,
+    Systems.spawning,
+
+    Systems.syncTransformToCollider,
+
     Systems.roadHandler,
 
     Systems.roadRenderer,
     Systems.shapeRenderer
 )
 
+World:setResource("hc", HC.new(100))
+
 ECS.entity(World)
-:assemble(Assemblages.websocketClient, "keyslam.com", 8080, "JustinEnNyk")
+:assemble(Assemblages.websocketClient, "keyslam.com", 8080, "pizza")
 
 RoadBuilder()
 
-:node("1-start", 550, 240)
+:node("1-start", 550, 240, false)
 :node("1-end", 450, 240)
 :node("1-post", 400, 240)
 
-:node("2a-start", 550, 250)
+:node("2a-start", 550, 250, false)
 :node("2a-end", 450, 250)
 
-:node("2b-start", 550, 260)
+:node("2b-start", 550, 260, false)
 :node("2b-end", 450, 260)
 
-:node("3-start", 550, 270)
+:node("3-start", 550, 270, false)
 :node("3-end", 450, 270)
 :node("3-post", 400, 270)
 
 
-:node("4a-start", 300, 450)
+:node("4a-start", 300, 450, false)
 :node("4a-end", 300, 400)
 :node("4a-post", 300, 350)
 
-:node("4b-start", 310, 450)
+:node("4b-start", 310, 450, true)
 :node("4b-end", 310, 400)
 :node("4b-post", 310, 350)
 
-:node("5-start", 290, 450)
+:node("5-start", 290, 450, false)
 :node("5-end", 290, 400)
 :node("5-post", 290, 350)
 
-:node("7-start", 0, 330)
+:node("7-start", 0, 330, false)
 :node("7-end", 100, 330)
 :node("7-post", 180, 330)
 
-:node("8a-start", 0, 310)
+:node("8a-start", 0, 310, false)
 :node("8a-end", 100, 310)
 
-:node("8b-start", 0, 320)
+:node("8b-start", 0, 320, false)
 :node("8b-end", 100, 320)
 
-:node("9-start", 0, 300)
+:node("9-start", 0, 300, false)
 :node("9-end", 100, 300)
 :node("9-post", 150, 300)
 
-:node("10-start", 200,   0)
+:node("10-start", 200,   0, false)
 :node("10-end",   200, 100)
 :node("10-post",  200, 150)
 
-:node("11-start", 210, 0)
+:node("11-start", 210, 0, false)
 :node("11-end", 210, 100)
 
-:node("12-start", 220, 0)
+:node("12-start", 220, 0, false)
 :node("12-end", 220, 100)
 :node("12-post", 220, 150)
 
@@ -165,18 +175,30 @@ RoadBuilder()
 
 :build(World)
 
-ECS.entity(World)
-:assemble(Assemblages.car, {x = 210, y = 80}, math.pi/2)
-
 function love.update(dt)
     World:emit("update", dt)
 end
 
 function love.draw()
-    love.graphics.scale(1, 1)
+    love.graphics.scale(1.5, 1.5)
     World:emit("draw")
+
+    love.graphics.print(love.timer.getFPS())
+
+    -- local hc = World:getResource("hc")
+    -- love.graphics.setColor(1, 1, 1, 0.1)
+    -- hc._hash:draw("line", false, true)
+
+    -- for _, shape in pairs(hc._hash:shapes()) do
+    --     love.graphics.setColor(1, 0, 0, 1)
+    --     shape:draw("line")
+    -- end
 end
 
 function love.quit()
     World:emit("quit")
+end
+
+function love.keypressed()
+    World:emit("spawn")
 end
