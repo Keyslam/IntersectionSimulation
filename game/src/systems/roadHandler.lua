@@ -22,6 +22,13 @@ function RoadHandler:MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(_, data)
 
 end
 
+function RoadHandler:reset()
+    for _, e in ipairs(self.pool) do
+        e.state.value = "RED"
+        self:__syncColor(e)
+    end
+end
+
 function RoadHandler:__syncColor(e)
     if (e.state.value == "RED") then
         e.color.value = Colors.road.red

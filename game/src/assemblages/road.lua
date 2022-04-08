@@ -1,9 +1,9 @@
 local Colors = require("src.colors")
 
-return function(e, from, to, kind, id)
+return function(e, from, to, kind, id, sensorId)
     e
     :give("color", Colors.road.normal)
-    :give("connection")
+    :give("road", sensorId)
 
     if (id) then
         e

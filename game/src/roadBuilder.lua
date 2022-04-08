@@ -14,11 +14,11 @@ function RoadBuilder.new()
     return roadBuilder
 end
 
-function RoadBuilder:node(name, x, y, isStart)
+function RoadBuilder:node(name, x, y, spawnerId)
     local node = {
         x = x,
         y = y,
-        isStart = isStart
+        spawnerId = spawnerId
     }
 
     self.nodes[name] = node
@@ -26,12 +26,13 @@ function RoadBuilder:node(name, x, y, isStart)
     return self
 end
 
-function RoadBuilder:edge(from, to, curveType, id)
+function RoadBuilder:edge(from, to, curveType, id, sensorId)
     local edge = {
         from = from,
         to = to,
         curveType = curveType,
         id = id,
+        sensorId = sensorId,
     }
 
     table.insert(self.edges, edge)
@@ -53,7 +54,7 @@ function RoadBuilder:build(world)
         end
 
         local road = ECS.entity(world)
-        :assemble(Assemblages.road, {x = from.x, y = from.y}, {x = to.x, y = to.y}, edge.curveType, edge.id)
+        :assemble(Assemblages.road, {x = from.x, y = from.y}, {x = to.x, y = to.y}, edge.curveType, edge.id, edge.sensorId)
 
         self.roads[road] = {
             from = edge.from,
@@ -68,8 +69,8 @@ function RoadBuilder:build(world)
             local from = odata.from
 
             if (to == from) then
-                table.insert(road.connection.to, oroad)
-                table.insert(oroad.connection.from, road)
+                table.insert(road.road.to, oroad)
+                table.insert(oroad.road.from, road)
             end
         end
     end
@@ -77,9 +78,9 @@ function RoadBuilder:build(world)
     for road, data in pairs(self.roads) do
         local from = self.nodes[data.from]
 
-        if (from.isStart) then
+        if (from.spawnerId) then
             ECS.entity(world)
-            :assemble(Assemblages.spawner, "CAR", road)
+            :assemble(Assemblages.spawner, "CAR", road, from.spawnerId)
         end
     end
 end

@@ -26,6 +26,7 @@ function WebsocketHandler:update(dt)
 end
 
 function WebsocketHandler:onOpen(e)
+    print("open")
     local message = Json.encode({
         eventType = "CONNECT_SIMULATOR",
 
@@ -53,21 +54,46 @@ end
 function WebsocketHandler.MESSAGE_SESSION_START(self, e, data)
     print("Session started")
 
+    e.websocket.running = true
+end
+
+function WebsocketHandler.MESSAGE_SESSION_STOP(self, e, data)
+    e.websocket.running = false
+
+    self:getWorld():emit("reset")
+end
+
+function WebsocketHandler:ENTITY_ENTERED_ZONE(routeId, sensorId)
     local message = Json.encode({
         eventType = "ENTITY_ENTERED_ZONE",
 
         data = {
-            routeId = 4,
-            sensorId = 20,
+            routeId = routeId,
+            sensorId = sensorId,
         }
     })
 
-    self:getWorld():emit("messageSent", e, message)
-    e.websocket.client:send(message)
+    for _, e in ipairs(self.pool) do
+        self:getWorld():emit("messageSent", e, message)
+        e.websocket.client:send(message)
+    end
 end
 
-function WebsocketHandler.MESSAGE_SESSION_STOP(self, e, data)
-    print("Session ended")
+function WebsocketHandler:ENTITY_EXITED_ZONE(routeId, sensorId)
+    local message = Json.encode({
+        eventType = "ENTITY_EXITED_ZONE",
+
+        data = {
+            routeId = routeId,
+            sensorId = sensorId,
+        }
+    })
+
+    for _, e in ipairs(self.pool) do
+        self:getWorld():emit("messageSent", e, message)
+        e.websocket.client:send(message)
+    end
 end
+
 
 return WebsocketHandler

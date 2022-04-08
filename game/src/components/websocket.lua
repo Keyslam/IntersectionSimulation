@@ -6,4 +6,6 @@ return ECS.component("websocket", function(e, host, port, sessionName, sessionVe
     e.sessionVersion = sessionVersion
 
     e.client = nil
+
+    e.running = false
 end)

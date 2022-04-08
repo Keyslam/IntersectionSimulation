@@ -1,5 +1,5 @@
 local RoadRenderer = ECS.system({
-    pool = {"curve", "color"}
+    pool = {"road", "curve", "color"}
 })
 
 function RoadRenderer:draw()
@@ -10,8 +10,8 @@ function RoadRenderer:draw()
         local startX, startY = e.curve.value:getControlPoint(1)
         local endX, endY = e.curve.value:getControlPoint(e.curve.value:getControlPointCount())
 
-        -- love.graphics.circle("fill", startX, startY, 2)
-        -- love.graphics.circle("fill", endX, endY, 2)
+        love.graphics.circle("fill", startX, startY, 2)
+        love.graphics.circle("fill", endX, endY, 2)
     end
 end
 
