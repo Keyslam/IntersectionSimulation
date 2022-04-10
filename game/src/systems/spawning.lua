@@ -9,7 +9,7 @@ function Spawning:spawn()
     end
 
     for _, e in ipairs(self.pool) do
-        if (love.math.random() > 0.98) then
+        if (love.math.random() > 0.96) then
             ECS.entity(self:getWorld())
             :assemble(Assemblages.car, e.spawner.road)
         end
@@ -23,6 +23,7 @@ function Spawning:spawn_pre()
 
     for _, e in ipairs(self.pool) do
         local id = e.spawner.id
+
         if (id == "1" or id == "2a" or id == "2b" or id == "8a" or id == "8b") then
             ECS.entity(self:getWorld())
             :assemble(Assemblages.car, e.spawner.road)

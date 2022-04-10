@@ -42,11 +42,9 @@ function RoadFollowing:update(dt)
         end
 
         local speed = e.roadFollower.velocity * dt
-        local length = road.curve.length
 
-        local additionalProgress = speed / length
-
-        e.roadFollower.progress = math.min(1, e.roadFollower.progress + additionalProgress)
+        local newProgress = road.curve:step(e.roadFollower.progress, speed)
+        e.roadFollower.progress = math.min(1, newProgress)
 
         if (targetVelocity > e.roadFollower.velocity) then
             local acceleration = e.roadFollower.acceleration * dt
@@ -70,6 +68,7 @@ end
 
 function RoadFollowing:reset()
     for _, e in ipairs(self.pool) do
+        e.roadFollower:setRoad(nil)
         e:destroy()
     end
 end

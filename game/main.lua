@@ -38,7 +38,7 @@ World:addSystems(
 World:setResource("hc", HC.new(100))
 
 ECS.entity(World)
-:assemble(Assemblages.websocketClient, "keyslam.com", 8080, "burgermetfriet")
+:assemble(Assemblages.websocketClient, "keyslam.com", 8080, "pannekoek")
 
 RoadBuilder()
 
@@ -177,13 +177,13 @@ RoadBuilder()
 :build(World)
 
 local autospawning = false
-local spawnTimer = 0.5
+local spawnTimer = 0.3
 
 function love.update(dt)
     if (autospawning) then
         spawnTimer = spawnTimer - dt
         if (spawnTimer <= 0) then
-            spawnTimer = 0.5
+            spawnTimer = 0.3
             World:emit("spawn")
         end
     end

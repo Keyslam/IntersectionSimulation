@@ -2,10 +2,23 @@ local curve = ECS.component("curve", function(e, ...)
     e.value = love.math.newBezierCurve(...)
 
     e.length = e:calculateLength(100)
+    e.derivative = e.value:getDerivative()
 end)
 
 function curve:getStartPoint()
     return self.value:getControlPoint(1)
+end
+
+function curve:step(t, step)
+    t = (t < 0 and 0) or (t > 1 and 1) or t
+
+	local dx, dy = self.derivative:evaluate(t)
+	local dlen = math.sqrt(dx * dx + dy * dy)
+
+	dx, dy = -dy / dlen, dx / dlen
+	t = t + step / dlen
+
+    return t
 end
 
 function curve:calculateLength(samples, start, finish)

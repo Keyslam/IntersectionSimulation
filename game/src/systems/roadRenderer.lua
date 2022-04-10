@@ -12,7 +12,17 @@ function RoadRenderer:draw()
 
         love.graphics.circle("fill", startX, startY, 2)
         love.graphics.circle("fill", endX, endY, 2)
+
+        -- local t = 0
+        -- while (t <= 1) do
+        --     local x, y = e.curve.value:evaluate(t)
+        --     love.graphics.circle("fill", x, y, 2)
+
+        --     t = e.curve:step(t, 5)
+        -- end
     end
 end
+
+
 
 return RoadRenderer
