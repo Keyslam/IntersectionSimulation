@@ -18,7 +18,12 @@ function RoadRenderer:draw()
         --     local x, y = e.curve.value:evaluate(t)
         --     love.graphics.circle("fill", x, y, 2)
 
-        --     t = e.curve:step(t, 5)
+        --     t = e.curve:step(t, 20)
+        -- end
+
+        -- for i = 0, 1, 0.2 do
+        --     local x, y = e.curve.value:evaluate(i)
+        --     love.graphics.circle("fill", x, y, 2)
         -- end
     end
 end

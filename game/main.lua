@@ -42,17 +42,17 @@ ECS.entity(World)
 
 RoadBuilder()
 
-:node("1-start", 550, 240, "1")
+:node("1-start", 550, 240)
 :node("1-end", 450, 240)
 :node("1-post", 400, 240)
 
-:node("2a-start", 550, 250, "2a")
+:node("2a-start", 550, 250)
 :node("2a-end", 450, 250)
 
-:node("2b-start", 550, 260, "2b")
+:node("2b-start", 550, 260)
 :node("2b-end", 450, 260)
 
-:node("3-start", 550, 270, "3")
+:node("3-start", 550, 270)
 :node("3-end", 450, 270)
 :node("3-post", 400, 270)
 
@@ -104,10 +104,10 @@ RoadBuilder()
 :node("3-7-11-end", 210, 450)
 
 :node("4a-8a-12-start", 400, 310)
-:node("4a-8a-12-end", 550, 310)
+:node("4a-8a-12-end", 500, 310)
 
 :node("4b-8b-start", 400, 320)
-:node("4b-8b-end", 550, 320)
+:node("4b-8b-end", 500, 320)
 
 :node("2b-5-start", 150, 260)
 :node("2b-5-end", 0, 260)
@@ -174,10 +174,96 @@ RoadBuilder()
 :edge("1-5-9-start", "1-5-9-end", "STRAIGHT")
 :edge("2b-5-start", "2b-5-end", "STRAIGHT")
 
+
+:node("4-8-12-merge", 750, 320)
+
+:edge("4a-8a-12-end", "4-8-12-merge", "S_HORIZONTAL")
+:edge("4b-8b-end", "4-8-12-merge", "STRAIGHT")
+
+
+:node("1-2a-2b-3-merge", 750, 260)
+
+
+:edge("1-2a-2b-3-merge", "1-start", "S_HORIZONTAL")
+:edge("1-2a-2b-3-merge", "2a-start", "S_HORIZONTAL")
+:edge("1-2a-2b-3-merge", "2b-start", "STRAIGHT")
+:edge("1-2a-2b-3-merge", "3-start", "S_HORIZONTAL")
+
+
+:node("bridge-end-top", 1000, 300)
+:node("bridge-end-bottom", 1000, 310)
+
+:edge("bridge-end-top", "1-2a-2b-3-merge", "S_HORIZONTAL")
+:edge("4-8-12-merge", "bridge-end-bottom", "S_HORIZONTAL")
+
+
+:node("bridge-start-top", 1100, 300)
+:node("bridge-start-bottom", 1100, 310)
+
+:edge("bridge-start-top", "bridge-end-top", "S_HORIZONTAL")
+:edge("bridge-end-bottom", "bridge-start-bottom", "S_HORIZONTAL")
+
+
+:node("bridge-runup-top", 1150, 300)
+:node("bridge-runup-bottom", 1150, 310)
+
+:edge("bridge-runup-top", "bridge-start-top", "STRAIGHT")
+:edge("bridge-start-bottom", "bridge-runup-bottom", "STRAIGHT")
+
+
+:node("south-entry-start", 1225, 500, "south")
+:node("south-entry-end", 1225, 375)
+:node("south-exit-start", 1215, 375)
+:node("south-exit-end", 1215, 500)
+
+
+-- :node("roundabout-north", 1220, 255)
+-- :node("roundabout-east", 1270, 305)
+-- :node("roundabout-south", 1220, 355)
+-- :node("roundabout-west", 1170, 305)
+
+:node("roundabout-west-entry", 1170, 320)
+:node("roundabout-west-exit", 1170, 290)
+
+:node("roundabout-south-entry", 1235, 355)
+:node("roundabout-south-exit", 1205, 355)
+
+:node("roundabout-east-entry", 1270, 290)
+:node("roundabout-east-exit", 1270, 320)
+
+:node("roundabout-north-entry", 1205, 255)
+:node("roundabout-north-exit", 1235, 255)
+
+
+:edge("roundabout-west-exit", "roundabout-west-entry", "STRAIGHT")
+:edge("roundabout-south-exit", "roundabout-south-entry", "STRAIGHT")
+:edge("roundabout-east-exit", "roundabout-east-entry", "STRAIGHT")
+:edge("roundabout-north-exit", "roundabout-north-entry", "STRAIGHT")
+
+:edge("roundabout-west-entry", "roundabout-south-exit", "TURN_LEFT")
+:edge("roundabout-south-entry", "roundabout-east-exit", "TURN_RIGHT")
+:edge("roundabout-east-entry", "roundabout-north-exit", "TURN_LEFT")
+:edge("roundabout-north-entry", "roundabout-west-exit", "TURN_RIGHT")
+
+:edge("roundabout-west-exit", "bridge-runup-top", "TURN_LEFT")
+:edge("bridge-runup-bottom", "roundabout-west-entry", "TURN_RIGHT")
+
+:edge("roundabout-south-exit", "south-exit-start", "TURN_RIGHT")
+:edge("south-entry-end", "roundabout-south-entry", "TURN_LEFT")
+:edge("south-exit-start", "south-exit-end", "STRAIGHT")
+:edge("south-entry-start", "south-entry-end", "STRAIGHT")
+
+-- :edge("bridge-runup-bottom", "roundabout-west-entry", "STRAIGHT")
+-- :edge("bridge-runup-top", "roundabout-west-exit", "STRAIGHT")
+
+-- :edge("roundabout-east", "roundabout-north", "TURN_LEFT")
+
 :build(World)
 
 local autospawning = false
 local spawnTimer = 0.3
+
+local camera = {x = 0, y = 0, scale = 1}
 
 function love.update(dt)
     if (autospawning) then
@@ -193,10 +279,11 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.scale(1.5, 1.5)
+    love.graphics.push("all")
+    love.graphics.translate(camera.x, camera.y)
+    love.graphics.scale(camera.scale, camera.scale)
+    
     World:emit("draw")
-
-    love.graphics.print(love.timer.getFPS())
 
     -- local hc = World:getResource("hc")
     -- love.graphics.setColor(1, 1, 1, 0.1)
@@ -206,6 +293,23 @@ function love.draw()
     --     love.graphics.setColor(1, 0, 0, 1)
     --     shape:draw("line")
     -- end
+   
+    love.graphics.pop()
+
+    love.graphics.print(love.timer.getFPS())
+
+    
+end
+
+function love.mousemoved(x, y, dx, dy)
+    if (love.mouse.isDown(2)) then
+        camera.x = camera.x + dx
+        camera.y = camera.y + dy
+    end
+end
+
+function love.wheelmoved(dx, dy)
+    camera.scale = camera.scale + dy * 0.1
 end
 
 function love.quit()

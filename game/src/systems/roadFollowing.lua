@@ -24,18 +24,14 @@ function RoadFollowing:update(dt)
 
                 if (canBreakInTime and not canBreakInTimeNextFrame) then
                     targetVelocity = 0
-                    -- print("Braking")
                 end
             end
         end
 
         local distanceToNextFollower = e.roadFollower:distanceToNextFollower()
         if (distanceToNextFollower) then
-            local stoppingDistance = (e.roadFollower.velocity ^ 2) / (2 * e.roadFollower.deceleration) + 20
+            local stoppingDistance = (e.roadFollower.velocity ^ 2) / (2 * e.roadFollower.deceleration) + 15
 
-            if (e.roadFollower.velocity > 0) then
-                -- print(distanceToNextFollower)
-            end
             if (stoppingDistance > distanceToNextFollower) then
                 targetVelocity = 0
             end

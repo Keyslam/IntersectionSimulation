@@ -26,7 +26,6 @@ function WebsocketHandler:update(dt)
 end
 
 function WebsocketHandler:onOpen(e)
-    print("open")
     local message = Json.encode({
         eventType = "CONNECT_SIMULATOR",
 
