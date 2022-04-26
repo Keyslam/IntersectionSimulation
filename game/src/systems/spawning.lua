@@ -30,14 +30,14 @@ function Spawning:spawn_pre()
         end
 
         if (id == "5") then
-            for i = 1, 2 do
+            for i = 1, 1 do
                 ECS.entity(self:getWorld())
                 :assemble(Assemblages.car, e.spawner.road)
             end
         end
 
         if (id == "10") then
-            for i = 1, 3 do
+            for i = 1, 1 do
                 ECS.entity(self:getWorld())
                 :assemble(Assemblages.car, e.spawner.road)
             end
