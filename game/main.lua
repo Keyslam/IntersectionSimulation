@@ -47,6 +47,7 @@ World:setResource("hc", HC.new(100))
 World:setResource("grid", {
     size = 50,
     map = {},
+    connections = {}
 })
 World:setResource("camera", camera)
 
@@ -314,6 +315,8 @@ function love.draw()
     -- end
     camera:detach()
 
+    World:emit("drawHud")
+
     love.graphics.print(love.timer.getFPS())
 end
 
@@ -353,6 +356,8 @@ function love.keypressed(key)
     if (key == "s") then
         World:emit("spawn_pre")
     end
+
+    World:emit("keypressed", key)
 end
 
 local TICK_RATE = 1 / 300
