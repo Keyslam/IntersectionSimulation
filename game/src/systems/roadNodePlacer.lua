@@ -1,10 +1,5 @@
 local RoadNodePlacer = ECS.system()
 
-function RoadNodePlacer:init()
-    self.selected = nil
-    self.roadKind = "STRAIGHT"
-end
-
 function RoadNodePlacer:draw()
     local camera = self:getWorld():getResource("camera")
     local grid = self:getWorld():getResource("grid")
@@ -18,13 +13,9 @@ function RoadNodePlacer:draw()
     love.graphics.circle("line", mouseX, mouseY, 8)
 end
 
-function RoadNodePlacer:drawHud()
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.print("Road kind: " ..self.roadKind, 5, 30)
-end
-
 function RoadNodePlacer:mousepressed(x, y, button)
     local camera = self:getWorld():getResource("camera")
+    local editorSettings = self:getWorld():getResource("editorSettings")
     local grid = self:getWorld():getResource("grid")
 
     if (button == 1) then
@@ -32,11 +23,11 @@ function RoadNodePlacer:mousepressed(x, y, button)
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
         mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
 
-        if (not self.selected) then
+        if (not editorSettings.selected) then
             if (grid.map[mouseX] and grid.map[mouseX][mouseY]) then
                 local e = grid.map[mouseX][mouseY]
 
-                self.selected = e
+                editorSettings.selected = e
             else
                 local e = ECS.entity(self:getWorld())
                 :give("roadNode", {x = mouseX, y = mouseY})
@@ -50,6 +41,7 @@ end
 
 function RoadNodePlacer:mousereleased(x, y, button)
     local camera = self:getWorld():getResource("camera")
+    local editorSettings = self:getWorld():getResource("editorSettings")
     local grid = self:getWorld():getResource("grid")
 
     if (button == 1) then
@@ -57,56 +49,58 @@ function RoadNodePlacer:mousereleased(x, y, button)
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
         mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
 
-        if (self.selected) then
+        if (editorSettings.selected) then
             if (grid.map[mouseX] and grid.map[mouseX][mouseY]) then
                 local e = grid.map[mouseX][mouseY]
 
-                if (e ~= self.selected) then
-                    if (grid.connections[self.selected] and grid.connections[self.selected][e]) then
-                        grid.connections[self.selected][e]:destroy()
-                        grid.connections[self.selected][e] = nil
-                        grid.connections[e][self.selected] = nil
+                if (e ~= editorSettings.selected) then
+                    if (grid.connections[editorSettings.selected] and grid.connections[editorSettings.selected][e]) then
+                        grid.connections[editorSettings.selected][e]:destroy()
+                        grid.connections[editorSettings.selected][e] = nil
+                        grid.connections[e][editorSettings.selected] = nil
                     else
                         local road = ECS.entity(self:getWorld())
-                        :assemble(Assemblages.road, e.roadNode.position, self.selected.roadNode.position, self.roadKind)
+                        :assemble(Assemblages.road, e.roadNode.position, editorSettings.selected.roadNode.position, editorSettings.roadKind)
 
-                        grid.connections[self.selected] = grid.connections[self.selected] or {}
+                        grid.connections[editorSettings.selected] = grid.connections[editorSettings.selected] or {}
                         grid.connections[e] = grid.connections[e] or {}
 
-                        grid.connections[self.selected][e] = road
-                        grid.connections[e][self.selected] = road
+                        grid.connections[editorSettings.selected][e] = road
+                        grid.connections[e][editorSettings.selected] = road
                     end
                 else
-                    if (grid.connections[self.selected]) then
-                        for k, _ in pairs(grid.connections[self.selected]) do
-                            grid.connections[self.selected][k]:destroy()
-                            grid.connections[self.selected][k] = nil
-                            grid.connections[k][self.selected] = nil
+                    if (grid.connections[editorSettings.selected]) then
+                        for k, _ in pairs(grid.connections[editorSettings.selected]) do
+                            grid.connections[editorSettings.selected][k]:destroy()
+                            grid.connections[editorSettings.selected][k] = nil
+                            grid.connections[k][editorSettings.selected] = nil
                         end
                     end
 
                     grid.map[mouseX][mouseY] = nil
-                    self.selected:destroy()
+                    editorSettings.selected:destroy()
                 end
             end
 
-            self.selected = nil
+            editorSettings.selected = nil
         end
     end
 end
 
 function RoadNodePlacer:keypressed(key)
+    local editorSettings = self:getWorld():getResource("editorSettings")
+
     if (key == "k") then
-        if (self.roadKind == "STRAIGHT") then
-            self.roadKind = "TURN_LEFT"
-        elseif (self.roadKind == "TURN_LEFT") then
-            self.roadKind = "TURN_RIGHT"
-        elseif (self.roadKind == "TURN_RIGHT") then
-            self.roadKind = "S_HORIZONTAL"
-        elseif (self.roadKind == "S_HORIZONTAL") then
-            self.roadKind = "S_VERTICAL"
-        elseif (self.roadKind == "S_VERTICAL") then
-            self.roadKind = "STRAIGHT"
+        if (editorSettings.roadKind == "STRAIGHT") then
+            editorSettings.roadKind = "TURN_LEFT"
+        elseif (editorSettings.roadKind == "TURN_LEFT") then
+            editorSettings.roadKind = "TURN_RIGHT"
+        elseif (editorSettings.roadKind == "TURN_RIGHT") then
+            editorSettings.roadKind = "S_HORIZONTAL"
+        elseif (editorSettings.roadKind == "S_HORIZONTAL") then
+            editorSettings.roadKind = "S_VERTICAL"
+        elseif (editorSettings.roadKind == "S_VERTICAL") then
+            editorSettings.roadKind = "STRAIGHT"
         end
     end
 end
