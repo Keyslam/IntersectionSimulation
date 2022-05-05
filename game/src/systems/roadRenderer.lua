@@ -8,8 +8,10 @@ function RoadRenderer:draw()
             goto skip
         end
 
-        if (e.hovered) then
+        if (e.selected) then
             love.graphics.setLineWidth(3)
+        elseif (e.hovered) then
+            love.graphics.setLineWidth(2)
         else
             love.graphics.setLineWidth(1)
         end

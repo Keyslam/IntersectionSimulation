@@ -4,6 +4,7 @@ return function(e, from, to, kind, id, sensorId)
     e
     :give("color", Colors.road.normal)
     :give("road", sensorId)
+    :give("selectable")
 
     if (id) then
         e

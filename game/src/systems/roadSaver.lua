@@ -6,6 +6,10 @@ function RoadSaver:save()
     local data = {}
 
     for _, e in ipairs(self.pool) do
+        if (e.preview) then
+            goto skip
+        end
+
         local road = e.road
         local curve = e.curve
 
@@ -22,6 +26,8 @@ function RoadSaver:save()
 
             kind = curve.kind,
         })
+
+        ::skip::
     end
 
     local serializedData = JSON.encode(data)

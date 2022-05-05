@@ -22,12 +22,16 @@ function RoadNodePlacer:draw()
     love.graphics.circle("line", mouseX, mouseY, 8)
 end
 
-function RoadNodePlacer:mousepressed(x, y, button)
-    local camera = self:getWorld():getResource("camera")
-    local editorSettings = self:getWorld():getResource("editorSettings")
-    local grid = self:getWorld():getResource("grid")
+function RoadNodePlacer:mousepressed(event)
+    if (event.consumed) then
+        return
+    end
 
-    if (button == 1) then
+    if (event.button == 1) then
+        local camera = self:getWorld():getResource("camera")
+        local editorSettings = self:getWorld():getResource("editorSettings")
+        local grid = self:getWorld():getResource("grid")
+
         local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
         mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
@@ -40,15 +44,22 @@ function RoadNodePlacer:mousepressed(x, y, button)
 
         editorSettings.drawing = true
         editorSettings.preview.preview.visible = true
+
+        event.consumed = true
     end
 end
 
-function RoadNodePlacer:mousereleased(x, y, button)
-    local camera = self:getWorld():getResource("camera")
-    local editorSettings = self:getWorld():getResource("editorSettings")
-    local grid = self:getWorld():getResource("grid")
+function RoadNodePlacer:mousereleased(event)
+    if (event.consumed) then
+        return
+    end
 
-    if (button == 1) then
+    local editorSettings = self:getWorld():getResource("editorSettings")
+    
+    if (editorSettings.drawing and event.button == 1) then
+        local camera = self:getWorld():getResource("camera")
+        local grid = self:getWorld():getResource("grid")
+
         local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
         mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
@@ -56,7 +67,7 @@ function RoadNodePlacer:mousereleased(x, y, button)
         local startPosition = editorSettings.preview.curve.from
         local endPosition = editorSettings.preview.curve.to
 
-        if (editorSettings.startPosition == endPosition) then
+        if (startPosition == endPosition) then
 
         else
             local road = ECS.entity(self:getWorld())
@@ -65,6 +76,8 @@ function RoadNodePlacer:mousereleased(x, y, button)
 
         editorSettings.drawing = false
         editorSettings.preview.preview.visible = false
+
+        event.consumed = true
     end
 end
 

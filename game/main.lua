@@ -33,8 +33,8 @@ World:setResource("camera", Camera(0, 0, 1))
 
 World:addSystems(
     Systems.gridRenderer,
-    Systems.roadNodePlacer,
     Systems.roadSelector,
+    Systems.roadNodePlacer,
 
     Systems.websocketHandler,
     Systems.websocketErrorHandler,
@@ -51,7 +51,9 @@ World:addSystems(
     Systems.shapeRenderer,
 
     Systems.roadSaver,
-    Systems.roadLoader
+    Systems.roadLoader,
+
+    Systems.roadSettingsGuiRenderer
 )
 
 local sessionName = "JustinEnNyk"
@@ -74,7 +76,7 @@ function love.draw()
     World:emit("draw")
     camera:detach()
 
-    if (Imgui.Begin("Session info")) then
+    if (Imgui.Begin("Debug")) then
         sessionName = Imgui.InputText("Session name", sessionName, 20)
 
         if (not websocketClient) then
@@ -105,7 +107,13 @@ function love.mousepressed(x, y, button)
     Imgui.MousePressed(button)
 
     if (not Imgui.GetWantCaptureMouse()) then
-        World:emit("mousepressed", x, y, button)
+        local event = {
+            x = x,
+            y = y,
+            button = button,
+            consumed = false,
+        }
+        World:emit("mousepressed", event)
     end
 end
 
@@ -113,7 +121,14 @@ function love.mousereleased(x, y, button)
     Imgui.MouseReleased(button)
 
     if (not Imgui.GetWantCaptureMouse()) then
-        World:emit("mousereleased", x, y, button)
+        local event = {
+            x = x,
+            y = y,
+            button = button,
+            consumed = false,
+        }
+
+        World:emit("mousereleased", event)
     end
 end
 
