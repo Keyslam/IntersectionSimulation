@@ -1,11 +1,20 @@
 local RoadNodePlacer = ECS.system()
 
+function RoadNodePlacer:init()
+    local editorSettings = self:getWorld():getResource("editorSettings")
+    editorSettings.preview = ECS.entity(self:getWorld())
+    :give("road")
+    :give("curve", Vector(0, 0), Vector(0, 0), "STRAIGHT")
+    :give("color", {1, 0, 0, 1})
+    :give("preview", false)
+end
+
 function RoadNodePlacer:draw()
     local camera = self:getWorld():getResource("camera")
     local grid = self:getWorld():getResource("grid")
 
     local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
-    mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size 
+    mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
     mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
 
     love.graphics.setColor(1, 0, 0, 1)
@@ -23,19 +32,14 @@ function RoadNodePlacer:mousepressed(x, y, button)
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
         mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
 
-        if (not editorSettings.selected) then
-            if (grid.map[mouseX] and grid.map[mouseX][mouseY]) then
-                local e = grid.map[mouseX][mouseY]
+        local position = Vector(mouseX, mouseY)
 
-                editorSettings.selected = e
-            else
-                local e = ECS.entity(self:getWorld())
-                :give("roadNode", {x = mouseX, y = mouseY})
+        editorSettings.preview.curve.from = position
+        editorSettings.preview.curve.to = position
+        editorSettings.preview.curve:updateBezier()
 
-                grid.map[mouseX] = grid.map[mouseX] or {}
-                grid.map[mouseX][mouseY] = e
-            end
-        end
+        editorSettings.drawing = true
+        editorSettings.preview.preview.visible = true
     end
 end
 
@@ -49,41 +53,35 @@ function RoadNodePlacer:mousereleased(x, y, button)
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
         mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
 
-        if (editorSettings.selected) then
-            if (grid.map[mouseX] and grid.map[mouseX][mouseY]) then
-                local e = grid.map[mouseX][mouseY]
+        local startPosition = editorSettings.preview.curve.from
+        local endPosition = editorSettings.preview.curve.to
 
-                if (e ~= editorSettings.selected) then
-                    if (grid.connections[editorSettings.selected] and grid.connections[editorSettings.selected][e]) then
-                        grid.connections[editorSettings.selected][e]:destroy()
-                        grid.connections[editorSettings.selected][e] = nil
-                        grid.connections[e][editorSettings.selected] = nil
-                    else
-                        local road = ECS.entity(self:getWorld())
-                        :assemble(Assemblages.road, e.roadNode.position, editorSettings.selected.roadNode.position, editorSettings.roadKind)
+        if (editorSettings.startPosition == endPosition) then
 
-                        grid.connections[editorSettings.selected] = grid.connections[editorSettings.selected] or {}
-                        grid.connections[e] = grid.connections[e] or {}
-
-                        grid.connections[editorSettings.selected][e] = road
-                        grid.connections[e][editorSettings.selected] = road
-                    end
-                else
-                    if (grid.connections[editorSettings.selected]) then
-                        for k, _ in pairs(grid.connections[editorSettings.selected]) do
-                            grid.connections[editorSettings.selected][k]:destroy()
-                            grid.connections[editorSettings.selected][k] = nil
-                            grid.connections[k][editorSettings.selected] = nil
-                        end
-                    end
-
-                    grid.map[mouseX][mouseY] = nil
-                    editorSettings.selected:destroy()
-                end
-            end
-
-            editorSettings.selected = nil
+        else
+            local road = ECS.entity(self:getWorld())
+            :assemble(Assemblages.road, startPosition, endPosition, editorSettings.roadKind)
         end
+
+        editorSettings.drawing = false
+        editorSettings.preview.preview.visible = false
+    end
+end
+
+function RoadNodePlacer:mousemoved(x, y, dx, dy)
+    local camera = self:getWorld():getResource("camera")
+    local editorSettings = self:getWorld():getResource("editorSettings")
+    local grid = self:getWorld():getResource("grid")
+
+    if (editorSettings.drawing) then
+        local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
+        mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
+        mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
+
+        local position = Vector(mouseX, mouseY)
+
+        editorSettings.preview.curve.to = position
+        editorSettings.preview.curve:updateBezier()
     end
 end
 
@@ -102,7 +100,43 @@ function RoadNodePlacer:keypressed(key)
         elseif (editorSettings.roadKind == "S_VERTICAL") then
             editorSettings.roadKind = "STRAIGHT"
         end
+
+        editorSettings.preview.curve.kind = editorSettings.roadKind
+        editorSettings.preview.curve:updateBezier()
     end
+end
+
+function RoadNodePlacer:wheelmoved(dx, dy)
+    local editorSettings = self:getWorld():getResource("editorSettings")
+
+    if (dy > 0) then
+        if (editorSettings.roadKind == "STRAIGHT") then
+            editorSettings.roadKind = "TURN_LEFT"
+        elseif (editorSettings.roadKind == "TURN_LEFT") then
+            editorSettings.roadKind = "TURN_RIGHT"
+        elseif (editorSettings.roadKind == "TURN_RIGHT") then
+            editorSettings.roadKind = "S_HORIZONTAL"
+        elseif (editorSettings.roadKind == "S_HORIZONTAL") then
+            editorSettings.roadKind = "S_VERTICAL"
+        elseif (editorSettings.roadKind == "S_VERTICAL") then
+            editorSettings.roadKind = "STRAIGHT"
+        end
+    elseif (dy < 0) then
+        if (editorSettings.roadKind == "STRAIGHT") then
+            editorSettings.roadKind = "S_VERTICAL"
+        elseif (editorSettings.roadKind == "TURN_LEFT") then
+            editorSettings.roadKind = "STRAIGHT"
+        elseif (editorSettings.roadKind == "TURN_RIGHT") then
+            editorSettings.roadKind = "TURN_LEFT"
+        elseif (editorSettings.roadKind == "S_HORIZONTAL") then
+            editorSettings.roadKind = "TURN_RIGHT"
+        elseif (editorSettings.roadKind == "S_VERTICAL") then
+            editorSettings.roadKind = "S_HORIZONTAL"
+        end
+    end
+
+    editorSettings.preview.curve.kind = editorSettings.roadKind
+    editorSettings.preview.curve:updateBezier()
 end
 
 return RoadNodePlacer

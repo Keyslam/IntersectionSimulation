@@ -19,7 +19,6 @@ function RoadHandler:MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(_, data)
             self:__syncColor(e)
         end
     end
-
 end
 
 function RoadHandler:reset()

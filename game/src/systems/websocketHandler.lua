@@ -6,8 +6,12 @@ local WebsocketHandler = ECS.system({
 })
 
 function WebsocketHandler:init()
+    local clients = {}
+
     self.pool.onAdded = function(_, e)
+        print("Connecting")
         e.websocket.client = Websocket.new(e.websocket.host, e.websocket.port)
+        clients[e] = e.websocket.client
 
         function e.websocket.client.onopen()
             self:onOpen(e)
@@ -16,6 +20,12 @@ function WebsocketHandler:init()
         function e.websocket.client.onmessage(_, message)
             self:onMessage(e, message)
         end
+    end
+
+    self.pool.onRemoved = function(_, e)
+        print("Disconnecting")
+        clients[e]:close()
+        clients[e] = nil
     end
 end
 
