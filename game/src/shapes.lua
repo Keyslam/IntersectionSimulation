@@ -64,6 +64,19 @@ Shapes.boat = {
     },
 }
 
+Shapes.warningLight = {
+    outline = {
+        1, 0,
+        6, 0,
+        7, 1,
+        7, 6,
+        6, 7,
+        1, 7,
+        0, 6,
+        0, 1,
+    }
+}
+
 for _, shape in pairs(Shapes) do
     for k, v in pairs(shape.outline) do
         shape.outline[k] = v * 5

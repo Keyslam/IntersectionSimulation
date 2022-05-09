@@ -8,7 +8,29 @@ local RoadFollower = ECS.component("roadFollower", function(e, road, maxVelocity
     e.acceleration = 120
     e.deceleration = 120
 
-    e.path = RoadGraph:getAvailablePaths(road)
+    e.isBrakingForLight = false
+
+    e.path = {}
+
+    do
+        local availablePaths = RoadGraph:getAvailablePaths(road)
+        local _road = road
+        while (_road) do
+            local aval = availablePaths[_road]
+            if (not aval) then
+                break
+            end
+
+            local pick = love.math.random(1, #aval)
+            local connections = RoadGraph:getConnections(_road)
+            local index = availablePaths[_road][pick]
+            local next = connections[index]
+            e.path[_road] = next
+            _road = next
+        end
+    end
+
+    -- e.path = RoadGraph:getAvailablePaths(road)
 
     e:setRoad(road)
 end)
@@ -92,11 +114,8 @@ function RoadFollower:getTraversingRoads()
     local road = self.road
 
     while (road) do
-        
         table.insert(roads, road)
-        road = nil
-        -- print("stuck")
-        -- road = (RoadGraph:getConnections(road) or {[1] = nil})[1]
+        road = self.path[road]
     end
 
     return roads

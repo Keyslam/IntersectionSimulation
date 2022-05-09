@@ -41,31 +41,30 @@ function RoadGraph:getConnections(e)
 end
 
 local function getAvailablePaths(self, e, visited, parentNode)
+    if (visited[e]) then
+        return false
+    end
+
     visited[e] = true
+
     local connections = self:getConnections(e)
     if (#connections == 0) then
         return true
     end
 
     parentNode[e] = {}
-    local hasAValidPath = false
 
-
+    local anyValid = false
     for i, connection in ipairs(connections) do
-        if (visited[connection]) then
-            goto skip
-        end
+        local isValid = getAvailablePaths(self, connection, visited, parentNode)
+        anyValid = anyValid or isValid
 
-        hasAValidPath = getAvailablePaths(self, connection, visited, parentNode) or hasAValidPath
-        
-        if (hasAValidPath) then
+        if (isValid) then
             table.insert(parentNode[e], i)
         end
-
-        ::skip::
     end
 
-    return hasAValidPath
+    return anyValid
 end
 
 function RoadGraph:getAvailablePaths(e)

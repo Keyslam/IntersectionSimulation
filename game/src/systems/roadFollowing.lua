@@ -10,9 +10,7 @@ function RoadFollowing:update(dt)
 
         local targetVelocity = e.roadFollower.maxVelocity
 
-        if road.state and (road.state.value == "ORANGE" or road.state.value == "RED") then
-            targetVelocity = e.roadFollower.maxVelocity
-        else
+        if (not e.roadFollower.isBrakingForLight) then
             local distanceToNextNonPassableLight = e.roadFollower:distanceToNextNonPassableLight()
 
             if (distanceToNextNonPassableLight) then
@@ -25,8 +23,23 @@ function RoadFollowing:update(dt)
                 local canBreakInTimeNextFrame = stoppingDistance < nextFrameDistanceToNextNonPassableLight
 
                 if (canBreakInTime and not canBreakInTimeNextFrame) then
-                    targetVelocity = 0
+                    e.roadFollower.isBrakingForLight = true
                 end
+            end
+        end
+
+        if (e.roadFollower.isBrakingForLight) then
+            if road.state and (road.state.value == "ORANGE" or road.state.value == "RED") then
+                e.roadFollower.isBrakingForLight = false
+                targetVelocity = e.roadFollower.maxVelocity
+            end
+
+            targetVelocity = 0
+
+            local distanceToNextNonPassableLight = e.roadFollower:distanceToNextNonPassableLight()
+
+            if (not distanceToNextNonPassableLight or distanceToNextNonPassableLight > 200) then
+                e.roadFollower.isBrakingForLight = false
             end
         end
 
@@ -54,9 +67,7 @@ function RoadFollowing:update(dt)
 
         if (e.roadFollower.progress == 1) then
             if (e.roadFollower.path[road]) then
-                local pick = love.math.random(1, #e.roadFollower.path[road])
-                local connections = RoadGraph:getConnections(road)
-                e.roadFollower:setRoad(connections[pick])
+                e.roadFollower:setRoad(e.roadFollower.path[road])
                 e.roadFollower.progress = 0
             else
                 e.roadFollower:setRoad(nil)

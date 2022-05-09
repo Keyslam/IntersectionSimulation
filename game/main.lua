@@ -56,9 +56,12 @@ World:addSystems(
     Systems.sensorHandler,
 
     Systems.roadHandler,
+    Systems.warningLightHandler,
+    Systems.barrierHandler,
 
     Systems.roadRenderer,
     Systems.shapeRenderer,
+    Systems.barrierRenderer,
 
     Systems.roadSaver,
     Systems.roadLoader,
@@ -66,7 +69,37 @@ World:addSystems(
     Systems.roadSettingsGuiRenderer
 )
 
-local sessionName = "JustinEnNyk"
+ECS.entity(World)
+:assemble(Assemblages.warningLight, 2850, 850)
+
+ECS.entity(World)
+:assemble(Assemblages.warningLight, 3500, 50)
+
+ECS.entity(World)
+:assemble(Assemblages.warningLight, 1700, -150)
+
+ECS.entity(World)
+:assemble(Assemblages.warningLight, 1700, 50)
+
+ECS.entity(World)
+:assemble(Assemblages.warningLight, 1700, 400)
+
+ECS.entity(World)
+:assemble(Assemblages.warningLight, 750, -150)
+
+ECS.entity(World)
+:assemble(Assemblages.warningLight, 750, 200)
+
+ECS.entity(World)
+:assemble(Assemblages.warningLight, 750, 400)
+
+ECS.entity(World)
+:assemble(Assemblages.barrier, 950, -300)
+
+ECS.entity(World)
+:assemble(Assemblages.barrier, 1500, -300)
+
+local sessionName = "pannekoeken"
 local websocketClient = nil
 
 function love.load()
@@ -115,6 +148,14 @@ function love.draw()
         grid.visible = Imgui.Checkbox("Grid visible", grid.visible)
         editorSettings.nodesVisible = Imgui.Checkbox("Nodes visible", editorSettings.nodesVisible)
         editorSettings.directionsVisible = Imgui.Checkbox("Directions visible", editorSettings.directionsVisible)
+
+        local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
+        mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
+        mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
+
+        Imgui.Text("X: " ..mouseX)
+        Imgui.SameLine()
+        Imgui.Text("Y: " ..mouseY)
     end
 
     love.graphics.setColor(1, 1, 1, 1)
