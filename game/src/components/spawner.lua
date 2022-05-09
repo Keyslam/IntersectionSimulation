@@ -1,5 +1,5 @@
-ECS.component("spawner", function(e, kind, road, id)
+ECS.component("spawner", function(e, kind)
     e.kind = kind
-    e.road = road
-    e.id = id
+    e.cooldown = 1
+    e.maxCooldown = 1
 end)

@@ -3,44 +3,37 @@ local Spawning = ECS.system({
     websockets = {"websocket"}
 })
 
-function Spawning:spawn()
-    if (not self.websockets[1].websocket.running) then
+function Spawning:update(dt)
+    -- if (#self.websockets == 0) then
+    --     return
+    -- end
+
+    -- if (not self.websockets[1].websocket.running) then
+    --     return
+    -- end
+
+    local settings = self:getWorld():setResource("settings")
+    if (not settings.spawningEnabled) then
         return
     end
 
     for _, e in ipairs(self.pool) do
-        if (love.math.random() > 0.96) then
-            ECS.entity(self:getWorld())
-            :assemble(Assemblages.car, e.spawner.road)
-        end
-    end
-end
+        e.spawner.cooldown = e.spawner.cooldown - dt
 
-function Spawning:spawn_pre()
-    if (not self.websockets[1].websocket.running) then
-        return
-    end
+        if (e.spawner.cooldown <= 0) then
+            if (love.math.random() > 0.9) then
+                local _e = ECS.entity(self:getWorld())
 
-    for _, e in ipairs(self.pool) do
-        local id = e.spawner.id
-
-        if (id == "south" or id == "8a" or id == "8b") then
-            ECS.entity(self:getWorld())
-            :assemble(Assemblages.car, e.spawner.road)
-        end
-
-        if (id == "5") then
-            for i = 1, 1 do
-                ECS.entity(self:getWorld())
-                :assemble(Assemblages.car, e.spawner.road)
+                if (e.spawner.kind == "AUTOMOBILE") then
+                    _e:assemble(Assemblages.car, e)
+                elseif (e.spawner.kind == "BICYCLE") then
+                    _e:assemble(Assemblages.bicycle, e)
+                elseif (e.spawner.kind == "PEDESTRIAN") then 
+                    _e:assemble(Assemblages.pedestrian, e)
+                end
             end
-        end
 
-        if (id == "10") then
-            for i = 1, 1 do
-                ECS.entity(self:getWorld())
-                :assemble(Assemblages.car, e.spawner.road)
-            end
+            e.spawner.cooldown = e.spawner.maxCooldown
         end
     end
 end

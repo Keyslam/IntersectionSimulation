@@ -10,6 +10,12 @@ function RoadHandler:init()
     self.pool.onAdded = function(_, e)
         self:__syncColor(e)
     end
+
+    self.pool.onRemoved = function(_, e)
+        if (e.color) then
+            e.color.value = Colors.road.normal
+        end
+    end
 end
 
 function RoadHandler:MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(_, data)

@@ -31,6 +31,11 @@ Shapes.bicycle = {
     },
 }
 
+for _, shape in pairs(Shapes) do
+    for k, v in pairs(shape.outline) do
+        shape.outline[k] = v * 5
+    end
+end
 
 for _, shape in pairs(Shapes) do
     local minX = math.huge

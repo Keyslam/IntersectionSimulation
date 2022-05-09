@@ -3,9 +3,8 @@ local Colors = require("src.colors")
 
 return function(e, road)
     return e
-    :give("roadFollower", road)
+    :give("roadFollower", road, 150)
     :give("transform", {x = 0, y = 0}, 0)
     :give("shape", Shapes.car)
     :give("color", Colors.car)
-    :give("collider")
 end

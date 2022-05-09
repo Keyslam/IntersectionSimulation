@@ -1,8 +1,8 @@
-local RoadFollower = ECS.component("roadFollower", function(e, road, progress)
+local RoadFollower = ECS.component("roadFollower", function(e, road, maxVelocity, progress)
     e.road = nil
     e.progress = progress or 0
     e.velocity = 0
-    e.maxVelocity = 150
+    e.maxVelocity = maxVelocity
     e.acceleration = 120
     e.deceleration = 120
 

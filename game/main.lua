@@ -1,6 +1,7 @@
 require("src.debugHandler")
 
 local Camera = require("lib.camera")
+local RoadGraph = require("src.roadGraph")
 
 local Colors = require("src.colors")
 love.graphics.setBackgroundColor(Colors.background)
@@ -21,6 +22,7 @@ local World = ECS.world()
 
 World:setResource("grid", {
     size = 50,
+    visible = true,
     map = {},
     connections = {}
 })
@@ -28,10 +30,18 @@ World:setResource("editorSettings", {
     preview = nil,
     drawing = false,
     roadKind = "STRAIGHT",
+    nodesVisible = true,
+    directionsVisible = true,
 })
-World:setResource("camera", Camera(0, 0, 1))
+World:setResource("camera", Camera(-3000, -200, 0.5))
+World:setResource("roadGraph", RoadGraph)
+World:setResource("settings", {
+    spawningEnabled = false,
+})
 
 World:addSystems(
+    Systems.roadGraphSync,
+
     Systems.gridRenderer,
     Systems.roadSelector,
     Systems.roadNodePlacer,
@@ -40,9 +50,9 @@ World:addSystems(
     Systems.websocketErrorHandler,
     Systems.messageLogger,
 
+    Systems.spawning,
     Systems.roadFollowing,
     Systems.syncRoadToTransform,
-    Systems.spawning,
     Systems.sensorHandler,
 
     Systems.roadHandler,
@@ -76,7 +86,14 @@ function love.draw()
     World:emit("draw")
     camera:detach()
 
+    local grid = World:getResource("grid")
+    local editorSettings = World:getResource("editorSettings")
+    local settings = World:setResource("settings")
+
     if (Imgui.Begin("Debug")) then
+        Imgui.Separator()
+        Imgui.Text("FPS: " ..love.timer.getFPS())
+
         sessionName = Imgui.InputText("Session name", sessionName, 20)
 
         if (not websocketClient) then
@@ -90,6 +107,13 @@ function love.draw()
                 websocketClient = nil
             end
         end
+
+        Imgui.Separator()
+
+        settings.spawningEnabled = Imgui.Checkbox("Spawning enabled", settings.spawningEnabled)
+        grid.visible = Imgui.Checkbox("Grid visible", grid.visible)
+        editorSettings.nodesVisible = Imgui.Checkbox("Nodes visible", editorSettings.nodesVisible)
+        editorSettings.directionsVisible = Imgui.Checkbox("Directions visible", editorSettings.directionsVisible)
     end
 
     love.graphics.setColor(1, 1, 1, 1)
@@ -138,7 +162,7 @@ function love.mousemoved(x, y, dx, dy)
     if (not Imgui.GetWantCaptureMouse()) then
         World:emit("mousemoved", x, y, dx, dy)
 
-        if (love.mouse.isDown(2)) then
+        if (love.mouse.isDown(2) and love.keyboard.isDown("lctrl")) then
             local camera = World:getResource("camera")
             camera:move(-dx / camera.scale, -dy / camera.scale)
         end

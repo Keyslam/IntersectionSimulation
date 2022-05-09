@@ -25,13 +25,18 @@ function RoadSaver:save()
             },
 
             kind = curve.kind,
+
+            spawnKind = e.spawner and e.spawner.kind,
+            id = e.id and e.id.value,
+            sensorId = road.sensorId,
+            isTunnel = road.isTunnel and true or false,
         })
 
         ::skip::
     end
 
     local serializedData = JSON.encode(data)
-    love.filesystem.write("roads.txt", serializedData)
+    love.filesystem.write("roads.json", serializedData)
 end
 
 return RoadSaver

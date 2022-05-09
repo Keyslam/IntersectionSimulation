@@ -3,7 +3,7 @@ local Colors = require("src.colors")
 local RoadLoader = ECS.system()
 
 function RoadLoader:load()
-    local serializedData= love.filesystem.read("roads.txt")
+    local serializedData= love.filesystem.read("roads.json")
 
     if (serializedData) then
         local data = JSON.decode(serializedData)
@@ -13,7 +13,13 @@ function RoadLoader:load()
             local to = Vector(roadData.to.x, roadData.to.y)
 
             local e = ECS.entity(self:getWorld())
-            :assemble(Assemblages.road, from, to, roadData.kind)
+            :assemble(Assemblages.road, from, to, roadData.kind, roadData.id, roadData.sensorId)
+
+            if (roadData.spawnKind) then
+                e:give("spawner", roadData.spawnKind)
+            end
+
+            e.road.isTunnel = roadData.isTunnel
         end
     end
 end

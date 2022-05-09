@@ -3,48 +3,76 @@ local RoadRenderer = ECS.system({
 })
 
 function RoadRenderer:draw()
+    local editorSettings = self:getWorld():getResource("editorSettings")
+
     for _, e in ipairs(self.pool) do
         if (e.preview and not e.preview.visible) then
             goto skip
         end
 
         if (e.selected) then
-            love.graphics.setLineWidth(3)
+            love.graphics.setLineWidth(5)
         elseif (e.hovered) then
-            love.graphics.setLineWidth(2)
+            love.graphics.setLineWidth(3)
         else
             love.graphics.setLineWidth(1)
         end
         love.graphics.setColor(e.color.value)
         love.graphics.line(e.curve.value:render())
 
-        local startX, startY = e.curve.value:getControlPoint(1)
-        local endX, endY = e.curve.value:getControlPoint(e.curve.value:getControlPointCount())
+        if (editorSettings.nodesVisible) then
+            local startX, startY = e.curve.value:getControlPoint(1)
+            local endX, endY = e.curve.value:getControlPoint(e.curve.value:getControlPointCount())
 
-        love.graphics.circle("fill", startX, startY, 4)
-        love.graphics.circle("fill", endX, endY, 4)
+            love.graphics.circle("fill", startX, startY, 4)
+            love.graphics.circle("fill", endX, endY, 4)
+        end
 
-        local t = 0
-        while (t <= 1) do
-            local midpoint = Vector(e.curve.value:evaluate(t))
-            local derivative = Vector(e.curve.derivative:evaluate(t)):normalizeInplace()
+
+        love.graphics.setColor(205 / 255, 73 / 255, 73 / 255)
+        love.graphics.setLineWidth(4)
+        -- local t = 0
+        -- while (t <= 1) do
+        --     local midpoint = Vector(e.curve.value:evaluate(t))
+        --     local derivative = Vector(e.curve.derivative:evaluate(t)):normalizeInplace()
+
+        --     local arrowL = derivative:clone():rotateInplace(-(math.pi / 2  * 1.7))
+        --     local arrowR = derivative:clone():rotateInplace(math.pi / 2  * 1.7)
+        --     love.graphics.line(
+        --         midpoint.x,
+        --         midpoint.y,
+        --         midpoint.x + arrowL.x * 15,
+        --         midpoint.y + arrowL.y * 15
+        --     )
+        --     love.graphics.line(
+        --         midpoint.x, 
+        --         midpoint.y,
+        --         midpoint.x + arrowR.x * 15,
+        --         midpoint.y + arrowR.y * 15
+        --     )
+
+        --     t = e.curve:step(t, 100)
+        -- end
+
+
+        if (editorSettings.directionsVisible) then
+            local midpoint = Vector(e.curve.value:evaluate(0.5))
+            local derivative = Vector(e.curve.derivative:evaluate(0.5)):normalizeInplace()
 
             local arrowL = derivative:clone():rotateInplace(-(math.pi / 2  * 1.7))
             local arrowR = derivative:clone():rotateInplace(math.pi / 2  * 1.7)
             love.graphics.line(
                 midpoint.x,
                 midpoint.y,
-                midpoint.x + arrowL.x * 10,
-                midpoint.y + arrowL.y * 10
+                midpoint.x + arrowL.x * 15,
+                midpoint.y + arrowL.y * 15
             )
             love.graphics.line(
-                midpoint.x, 
+                midpoint.x,
                 midpoint.y,
-                midpoint.x + arrowR.x * 10,
-                midpoint.y + arrowR.y * 10
+                midpoint.x + arrowR.x * 15,
+                midpoint.y + arrowR.y * 15
             )
-
-            t = e.curve:step(t, 50)
         end
 
         -- for i = 0, 1, 0.2 do

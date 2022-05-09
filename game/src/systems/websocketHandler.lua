@@ -14,6 +14,7 @@ function WebsocketHandler:init()
         clients[e] = e.websocket.client
 
         function e.websocket.client.onopen()
+            print("Connected")
             self:onOpen(e)
         end
 

@@ -8,8 +8,9 @@ local function Color(r, g, b, a)
 end
 
 local Colors = {
-    background = Color(39, 39, 68),
-
+    background = Color(17, 17, 30),
+    
+    shapefill = Color(211, 55, 52),
     car = Color(225, 225, 225),
     pedestrian = Color(225, 225, 225),
     bicycle = Color(225, 225, 225),

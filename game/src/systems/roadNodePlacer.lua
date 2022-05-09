@@ -1,11 +1,13 @@
-local RoadNodePlacer = ECS.system()
+local RoadNodePlacer = ECS.system({
+    pool = {"road", "curve", "selectable"}
+})
 
 function RoadNodePlacer:init()
     local editorSettings = self:getWorld():getResource("editorSettings")
     editorSettings.preview = ECS.entity(self:getWorld())
     :give("road")
     :give("curve", Vector(0, 0), Vector(0, 0), "STRAIGHT")
-    :give("color", {1, 0, 0, 1})
+    :give("color", {205 / 255, 73 / 255, 73 / 255})
     :give("preview", false)
 end
 
@@ -17,7 +19,7 @@ function RoadNodePlacer:draw()
     mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
     mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
 
-    love.graphics.setColor(1, 0, 0, 1)
+    love.graphics.setColor(205 / 255, 73 / 255, 73 / 255)
     love.graphics.circle("fill", mouseX, mouseY, 5)
     love.graphics.circle("line", mouseX, mouseY, 8)
 end
@@ -27,23 +29,42 @@ function RoadNodePlacer:mousepressed(event)
         return
     end
 
+    local camera = self:getWorld():getResource("camera")
+    local editorSettings = self:getWorld():getResource("editorSettings")
+    local grid = self:getWorld():getResource("grid")
+
+    local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
+    mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
+    mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
+
+    local position = Vector(mouseX, mouseY)
+
     if (event.button == 1) then
-        local camera = self:getWorld():getResource("camera")
-        local editorSettings = self:getWorld():getResource("editorSettings")
-        local grid = self:getWorld():getResource("grid")
-
-        local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
-        mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
-        mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
-
-        local position = Vector(mouseX, mouseY)
-
         editorSettings.preview.curve.from = position
         editorSettings.preview.curve.to = position
         editorSettings.preview.curve:updateBezier()
 
         editorSettings.drawing = true
         editorSettings.preview.preview.visible = true
+
+        event.consumed = true
+    end
+
+    if (event.button == 2) then
+        editorSettings.movingTos = {}
+        editorSettings.movingFroms = {}
+
+        for _, e in ipairs(self.pool) do
+            if (e.curve.to == position) then
+                table.insert(editorSettings.movingTos, e)
+            end
+
+            if (e.curve.from == position) then
+                table.insert(editorSettings.movingFroms, e)
+            end
+        end
+
+        editorSettings.moving = true
 
         event.consumed = true
     end
@@ -55,15 +76,17 @@ function RoadNodePlacer:mousereleased(event)
     end
 
     local editorSettings = self:getWorld():getResource("editorSettings")
-    
+
+    local camera = self:getWorld():getResource("camera")
+    local grid = self:getWorld():getResource("grid")
+
+    local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
+    mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
+    mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
+
+    local position = Vector(mouseX, mouseY)
+
     if (editorSettings.drawing and event.button == 1) then
-        local camera = self:getWorld():getResource("camera")
-        local grid = self:getWorld():getResource("grid")
-
-        local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
-        mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
-        mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
-
         local startPosition = editorSettings.preview.curve.from
         local endPosition = editorSettings.preview.curve.to
 
@@ -79,6 +102,22 @@ function RoadNodePlacer:mousereleased(event)
 
         event.consumed = true
     end
+
+    if (editorSettings.moving and event.button == 2) then
+        for _, e in ipairs(editorSettings.movingTos) do
+            e.curve.to = position
+            e.curve:updateBezier()
+        end
+
+        for _, e in ipairs(editorSettings.movingFroms) do
+            e.curve.from = position
+            e.curve:updateBezier()
+        end
+
+        editorSettings.moving = false
+
+        event.consumed = false
+    end
 end
 
 function RoadNodePlacer:mousemoved(x, y, dx, dy)
@@ -86,15 +125,29 @@ function RoadNodePlacer:mousemoved(x, y, dx, dy)
     local editorSettings = self:getWorld():getResource("editorSettings")
     local grid = self:getWorld():getResource("grid")
 
+    local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
+    mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
+    mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
+
+    local position = Vector(mouseX, mouseY)
+
     if (editorSettings.drawing) then
-        local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
-        mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size
-        mouseY = math.ceil((mouseY - grid.size/2) / grid.size) * grid.size
-
-        local position = Vector(mouseX, mouseY)
-
         editorSettings.preview.curve.to = position
         editorSettings.preview.curve:updateBezier()
+    end
+
+    if (editorSettings.moving) then
+        for _, e in ipairs(editorSettings.movingTos) do
+            e.curve.to = position
+            e.curve:updateBezier()
+        end
+
+        for _, e in ipairs(editorSettings.movingFroms) do
+            e.curve.from = position
+            e.curve:updateBezier()
+        end
+
+        editorSettings.moving = true
     end
 end
 

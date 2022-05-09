@@ -3,6 +3,8 @@ local RoadFollowing = ECS.system({
 })
 
 function RoadFollowing:update(dt)
+    local RoadGraph = self:getWorld():getResource("roadGraph")
+
     for _, e in ipairs(self.pool) do
         local road = e.roadFollower.road
 
@@ -51,8 +53,11 @@ function RoadFollowing:update(dt)
         end
 
         if (e.roadFollower.progress == 1) then
-            if (road.road.to[1]) then
-                e.roadFollower:setRoad(road.road.to[1])
+            local connections = RoadGraph:getConnections(road)
+
+            if (#connections > 0) then
+                local pick = love.math.random(1, #connections)
+                e.roadFollower:setRoad(connections[pick])
                 e.roadFollower.progress = 0
             else
                 e.roadFollower:setRoad(nil)

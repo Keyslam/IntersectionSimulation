@@ -19,6 +19,7 @@ function WebsocketErrorHandler:MESSAGE_ERROR_MALFORMED_MESSAGE(e, data)
     for _, err in ipairs(data.errors) do
         print("\t"..err)
     end
+    print(data.receivedMessage)
 end
 
 function WebsocketErrorHandler:MESSAGE_ERROR_INVALID_STATE(e, data)
