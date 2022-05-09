@@ -1,3 +1,5 @@
+local RoadGraph = require("src.roadGraph")
+
 local RoadFollower = ECS.component("roadFollower", function(e, road, maxVelocity, progress)
     e.road = nil
     e.progress = progress or 0
@@ -5,6 +7,8 @@ local RoadFollower = ECS.component("roadFollower", function(e, road, maxVelocity
     e.maxVelocity = maxVelocity
     e.acceleration = 120
     e.deceleration = 120
+
+    e.path = RoadGraph:getAvailablePaths(road)
 
     e:setRoad(road)
 end)
@@ -88,8 +92,11 @@ function RoadFollower:getTraversingRoads()
     local road = self.road
 
     while (road) do
+        
         table.insert(roads, road)
-        road = road.road and road.road.to[1] or nil
+        road = nil
+        -- print("stuck")
+        -- road = (RoadGraph:getConnections(road) or {[1] = nil})[1]
     end
 
     return roads

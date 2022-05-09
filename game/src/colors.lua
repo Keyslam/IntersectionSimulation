@@ -14,6 +14,7 @@ local Colors = {
     car = Color(225, 225, 225),
     pedestrian = Color(225, 225, 225),
     bicycle = Color(225, 225, 225),
+    boat = Color(225, 225, 225),
 
     road = {
         normal = Color(225, 225, 225),

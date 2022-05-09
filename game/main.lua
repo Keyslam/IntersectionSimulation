@@ -93,6 +93,7 @@ function love.draw()
     if (Imgui.Begin("Debug")) then
         Imgui.Separator()
         Imgui.Text("FPS: " ..love.timer.getFPS())
+        Imgui.Text("Entities: " ..#World:getEntities())
 
         sessionName = Imgui.InputText("Session name", sessionName, 20)
 

@@ -14,7 +14,7 @@ local sensorIds = {
     {1, 1}, {1, 2}, {2, 1}, {2, 2}, {2, 3}, {2, 4}, {3, 1}, {3, 2}, {4, 1}, {4, 2}, {4, 3}, {4, 4}, {5, 1}, {5, 2}, {7, 1}, {7, 2}, {8, 1}, {8, 2}, {8, 3}, {8, 4}, {9, 1}, {9, 2}, {10, 1}, {10, 2}, {11, 1}, {11, 2}, {12, 1}, {12, 2}, {15, 1}, {15, 2},
     {21, 1}, {22, 1}, {23, 1}, {24, 1},
     {31, 1}, {31, 2}, {32, 1}, {32, 2}, {33, 1}, {33, 2}, {34, 1}, {34, 2}, {35, 1}, {35, 2}, {36, 1}, {36, 2}, {37, 1}, {37, 2}, {38, 1}, {38, 2},
-    {41, 1}, {41, 2},
+    {41, 1}, {42, 1},
 }
 
 function RoadSettingsGuiRenderer:draw()
@@ -106,6 +106,8 @@ function RoadSettingsGuiRenderer:draw()
             end
 
             e.road.isTunnel = Imgui.Checkbox("Is Tunnel", e.road.isTunnel)
+            e.road.isBridgeRoad = Imgui.Checkbox("Is Bridge Road", e.road.isBridgeRoad)
+            e.road.isBridgeWater = Imgui.Checkbox("Is Bridge Water", e.road.isBridgeWater)
 
             Imgui.Separator()
 
@@ -121,11 +123,16 @@ function RoadSettingsGuiRenderer:draw()
                 :assemble(Assemblages.bicycle, e)
             end
 
-            Imgui.SameLine()
-
             if (Imgui.Button("Spawn (Pedestrian)")) then
                 ECS.entity(self:getWorld())
                 :assemble(Assemblages.pedestrian, e)
+            end
+
+            Imgui.SameLine()
+
+            if (Imgui.Button("Spawn (Boat)")) then
+                ECS.entity(self:getWorld())
+                :assemble(Assemblages.boat, e)
             end
 
             Imgui.Separator()

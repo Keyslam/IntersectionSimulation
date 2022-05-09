@@ -53,10 +53,9 @@ function RoadFollowing:update(dt)
         end
 
         if (e.roadFollower.progress == 1) then
-            local connections = RoadGraph:getConnections(road)
-
-            if (#connections > 0) then
-                local pick = love.math.random(1, #connections)
+            if (e.roadFollower.path[road]) then
+                local pick = love.math.random(1, #e.roadFollower.path[road])
+                local connections = RoadGraph:getConnections(road)
                 e.roadFollower:setRoad(connections[pick])
                 e.roadFollower.progress = 0
             else

@@ -30,6 +30,8 @@ function RoadSaver:save()
             id = e.id and e.id.value,
             sensorId = road.sensorId,
             isTunnel = road.isTunnel and true or false,
+            isBridgeRoad = road.isBridgeRoad and true or false,
+            isBridgeWater = road.isBridgeWater and true or false,
         })
 
         ::skip::

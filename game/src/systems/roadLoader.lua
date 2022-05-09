@@ -20,6 +20,8 @@ function RoadLoader:load()
             end
 
             e.road.isTunnel = roadData.isTunnel
+            e.road.isBridgeRoad = roadData.isBridgeRoad
+            e.road.isBridgeWater = roadData.isBridgeWater
         end
     end
 end
