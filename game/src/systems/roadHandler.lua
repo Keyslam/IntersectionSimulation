@@ -9,7 +9,9 @@ local RoadHandler = ECS.system({
 
 function RoadHandler:init()
     self.waitingForBridgeRoadEmpty = false
+    self.waitingForBridgeWaterEmpty = false
     self.idLookup = {}
+    self.t = 0
 
     self.pool.onAdded = function(_, e)
         self:__syncColor(e)
@@ -49,33 +51,70 @@ end
 
 function RoadHandler:MESSAGE_REQUEST_BRIDGE_ROAD_EMPTY(_, data)
     self.waitingForBridgeRoadEmpty = true
+    self.t = 2
+end
+
+function RoadHandler:MESSAGE_REQUEST_BRIDGE_WATER_EMPTY(_, data)
+    self.waitingForBridgeWaterEmpty = true
+    self.t = 2
 end
 
 function RoadHandler:update(dt)
-    if (not self.waitingForBridgeRoadEmpty) then
-        return
-    end
+    if (self.waitingForBridgeRoadEmpty) then
+        self.t = self.t - dt
 
-    local isEmpty = true
-    for _, e in ipairs(self.roads) do
-        if (e.road.isBridgeRoad) then
-            for _, _ in pairs(e.road.occupants) do
-                isEmpty = false
-                break
+        if (self.t < 0) then
+            local isEmpty = true
+            for _, e in ipairs(self.roads) do
+                if (e.road.isBridgeRoad) then
+                    for _, _ in pairs(e.road.occupants) do
+                        isEmpty = false
+                        break
+                    end
+                end
+            end
+
+            if (isEmpty) then
+                self.waitingForBridgeRoadEmpty = false
+
+                local message = Json.encode({
+                    eventType = "ACKNOWLEDGE_BRIDGE_ROAD_EMPTY",
+                })
+
+                for _, e in ipairs(self.websocket) do
+                    self:getWorld():emit("messageSent", e, message)
+                    e.websocket.client:send(message)
+                end
             end
         end
     end
 
-    if (isEmpty) then
-        self.waitingForBridgeRoadEmpty = false
+    if (self.waitingForBridgeWaterEmpty) then
+        self.t = self.t - dt
 
-        local message = Json.encode({
-            eventType = "ACKNOWLEDGE_BRIDGE_ROAD_EMPTY",
-        })
+        if (self.t < 0) then
+            local isEmpty = true
+            for _, e in ipairs(self.roads) do
+                if (e.road.isBridgeWater) then
+                    for _, _ in pairs(e.road.occupants) do
+                        isEmpty = false
+                        break
+                    end
+                end
+            end
 
-        for _, e in ipairs(self.websocket) do
-            self:getWorld():emit("messageSent", e, message)
-            e.websocket.client:send(message)
+            if (isEmpty) then
+                self.waitingForBridgeWaterEmpty = false
+
+                local message = Json.encode({
+                    eventType = "ACKNOWLEDGE_BRIDGE_WATER_EMPTY",
+                })
+
+                for _, e in ipairs(self.websocket) do
+                    self:getWorld():emit("messageSent", e, message)
+                    e.websocket.client:send(message)
+                end
+            end
         end
     end
 end

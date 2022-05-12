@@ -9,6 +9,7 @@ local RoadFollower = ECS.component("roadFollower", function(e, road, maxVelocity
     e.deceleration = 120
 
     e.isBrakingForLight = false
+    e.isBrakingForFollower = false
 
     e.path = {}
 
@@ -57,7 +58,7 @@ function RoadFollower:distanceToNextFollower()
         local nearestProgress = math.huge
 
         for __, follower in pairs(road.road.occupants) do
-            if (follower.roadFollower.progress > self.progress) then
+            if (i > 1 or follower.roadFollower.progress > self.progress) then
                 if (follower.roadFollower.progress < nearestProgress) then
                     nearestFollower = follower
                     nearestProgress = follower.roadFollower.progress
@@ -66,11 +67,19 @@ function RoadFollower:distanceToNextFollower()
         end
 
         if (nearestFollower) then
-            local distance = road.curve:calculateLength(50, progress, nearestProgress)
+            local distance
 
-            for j = 1, i - 1 do
-                distance = distance + road.curve:calculateLength(50)
+            if (i == 1) then
+                distance = roads[1].curve:calculateLength(50, progress, nearestProgress)
+            else
+                distance = roads[1].curve:calculateLength(50, self.progress, 1)
+
+                for j = 2, i do
+                    distance = distance + roads[j].curve:calculateLength(50, 0, nearestProgress)
+                end
             end
+
+            distance = distance - nearestFollower.shape.value.size.h
 
             return distance
         end
@@ -85,10 +94,28 @@ function RoadFollower:distanceToNextNonPassableLight(start)
     local roads = self:getTraversingRoads()
     local nonPassableLightIndex
 
+    local phase = math.floor((love.timer.getTime() / 2) % 4) + 1
+
     for i = 2, #roads do
         local road = roads[i]
 
+        -- if (road.road.phase and road.road.phase ~= phase) then
+        --     nonPassableLightIndex = i
+        -- end
+
+        if (road.road.isBridgeRoad and WarningLightsOn) then
+            nonPassableLightIndex = i
+
+            break
+        end
+
         if (road.state and (road.state.value == "ORANGE" or road.state.value == "RED")) then
+            nonPassableLightIndex = i
+
+            break
+        end
+
+        if (road.state and (road.state.value == "GREENRED" and road.road.isBridgeWater)) then
             nonPassableLightIndex = i
 
             break

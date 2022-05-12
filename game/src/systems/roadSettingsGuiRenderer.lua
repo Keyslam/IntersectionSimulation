@@ -105,6 +105,22 @@ function RoadSettingsGuiRenderer:draw()
                 Imgui.EndCombo()
             end
 
+            if (Imgui.BeginCombo("Phase", e.road.phase or "NONE")) then
+                if (Imgui.Selectable("NONE")) then
+                    e.road.phase = nil
+                end
+
+                for _, phase in ipairs({1, 2, 3, 4}) do
+                    if (Imgui.Selectable(phase)) then
+                        e.road.phase = phase
+                    end
+                end
+
+                Imgui.EndCombo()
+            end
+
+            Imgui.Separator()
+
             e.road.isTunnel = Imgui.Checkbox("Is Tunnel", e.road.isTunnel)
             e.road.isBridgeRoad = Imgui.Checkbox("Is Bridge Road", e.road.isBridgeRoad)
             e.road.isBridgeWater = Imgui.Checkbox("Is Bridge Water", e.road.isBridgeWater)

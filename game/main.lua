@@ -33,11 +33,13 @@ World:setResource("editorSettings", {
     nodesVisible = true,
     directionsVisible = true,
 })
-World:setResource("camera", Camera(-3000, -200, 0.5))
+World:setResource("camera", Camera(1000, -200, 0.5))
 World:setResource("roadGraph", RoadGraph)
 World:setResource("settings", {
     spawningEnabled = false,
 })
+
+WarningLightsOn = false
 
 World:addSystems(
     Systems.roadGraphSync,
@@ -53,7 +55,7 @@ World:addSystems(
     Systems.spawning,
     Systems.roadFollowing,
     Systems.syncRoadToTransform,
-    Systems.sensorHandler,
+    -- Systems.sensorHandler,
 
     Systems.roadHandler,
     Systems.warningLightHandler,
@@ -62,6 +64,7 @@ World:addSystems(
     Systems.roadRenderer,
     Systems.shapeRenderer,
     Systems.barrierRenderer,
+    Systems.bridgeHandler,
 
     Systems.roadSaver,
     Systems.roadLoader,
@@ -99,7 +102,7 @@ ECS.entity(World)
 ECS.entity(World)
 :assemble(Assemblages.barrier, 1500, -300)
 
-local sessionName = "pannekoeken"
+local sessionName = "tieten"
 local websocketClient = nil
 
 function love.load()
@@ -109,7 +112,10 @@ end
 function love.update(dt)
     Imgui.NewFrame(true)
 
-    World:emit("update", dt)
+    World:emit("update", dt/2)
+    World:emit("update", dt/2)
+    World:emit("update", dt/2)
+    World:emit("update", dt/2)
 end
 
 function love.draw()
@@ -148,6 +154,8 @@ function love.draw()
         grid.visible = Imgui.Checkbox("Grid visible", grid.visible)
         editorSettings.nodesVisible = Imgui.Checkbox("Nodes visible", editorSettings.nodesVisible)
         editorSettings.directionsVisible = Imgui.Checkbox("Directions visible", editorSettings.directionsVisible)
+        local phase = math.floor((love.timer.getTime() / 2) % 4) + 1
+        Imgui.Text("Phase: "..phase)
 
         local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size

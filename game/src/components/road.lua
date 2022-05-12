@@ -6,6 +6,8 @@ ECS.component("road", function(e, sensorId)
     e.isTunnel = false
     e.isBridgeRoad = false
     e.isBridgeWater = false
+    e.phase = nil
+    e.bridgeRoadProgress = 0
 
     e.preSensor = {}
     e.sensor = {}

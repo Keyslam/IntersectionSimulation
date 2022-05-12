@@ -18,7 +18,24 @@ function RoadRenderer:draw()
             love.graphics.setLineWidth(1)
         end
         love.graphics.setColor(e.color.value)
-        love.graphics.line(e.curve.value:render())
+
+        if (e.road.isBridgeRoad) then
+            local startX, startY = e.curve.value:getControlPoint(1)
+            local endX, endY = e.curve.value:getControlPoint(e.curve.value:getControlPointCount())
+
+            if (startX > endX) then
+                startX, startY, endX, endY = endX, endY, startX, startY
+            end
+
+            local start = Vector(startX, startY)
+            local finish = Vector(endX, endY)
+            local delta = (finish - start) * (e.road.bridgeRoadProgress * 0.5 + 0.5)
+            delta:rotateInplace(-math.pi / 2 * (1 - e.road.bridgeRoadProgress))
+
+            love.graphics.line(startX, startY, startX + delta.x, startY + delta.y)
+        else
+            love.graphics.line(e.curve.value:render())
+        end
 
         if (editorSettings.nodesVisible) then
             local startX, startY = e.curve.value:getControlPoint(1)

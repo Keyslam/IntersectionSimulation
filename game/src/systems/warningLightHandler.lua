@@ -25,6 +25,12 @@ function WarningLightHandler:MESSAGE_SET_BRIDGE_WARNING_LIGHT_STATE(_, data)
         self:__syncColor(e)
     end
 
+    if (data.state == "ON") then
+        WarningLightsOn = true
+    else
+        WarningLightsOn = false
+    end
+
 end
 
 function WarningLightHandler:__syncColor(e)

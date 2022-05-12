@@ -32,6 +32,7 @@ function RoadSaver:save()
             isTunnel = road.isTunnel and true or false,
             isBridgeRoad = road.isBridgeRoad and true or false,
             isBridgeWater = road.isBridgeWater and true or false,
+            phase = e.road.phase,
         })
 
         ::skip::

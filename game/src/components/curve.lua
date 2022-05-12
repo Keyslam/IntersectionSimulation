@@ -133,10 +133,7 @@ function curve:calculateLength(samples, start, finish)
     local previousPointX, previousPointY = self.value:evaluate(start)
     local t = start
 
-    local i = 0
-
     while (t <= finish) do
-        i = i + 1
         local currentPointX, currentPointY = self.value:evaluate(t)
 
         t = self:step(t, 5)

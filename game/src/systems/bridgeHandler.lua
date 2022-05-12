@@ -1,24 +1,28 @@
 local Colors = require("src.colors")
 local Json = require("lib.json")
 
-local BarrierHandler = ECS.system({
-    pool = {"barrier"},
+local BridgeHandler = ECS.system({
+    pool = {"road"},
     websocket = {"websocket"}
 })
 
-function BarrierHandler:init()
-    self.progress = 0
-    self.state = "UP"
-    self.acknowledged = "UP"
+function BridgeHandler:init()
+    self.progress = 1
+    self.state = "DOWN"
+    self.acknowledged = "DOWN"
 end
 
-function BarrierHandler:update(dt)
+function BridgeHandler:MESSAGE_REQUEST_BRIDGE_STATE(_, data)
+    self.state = data.state
+end
+
+function BridgeHandler:update(dt)
     if (self.state == "UP") then
         self.progress = math.max(0, self.progress - dt * 0.25)
 
         if (self.progress == 0 and self.state ~= self.acknowledged) then
             local message = Json.encode({
-                eventType = "ACKNOWLEDGE_BARRIERS_STATE",
+                eventType = "ACKNOWLEDGE_BRIDGE_STATE",
                 data = {
                     state = self.state
                 }
@@ -38,7 +42,7 @@ function BarrierHandler:update(dt)
 
         if (self.progress == 1 and self.state ~= self.acknowledged) then
             local message = Json.encode({
-                eventType = "ACKNOWLEDGE_BARRIERS_STATE",
+                eventType = "ACKNOWLEDGE_BRIDGE_STATE",
                 data = {
                     state = self.state
                 }
@@ -54,12 +58,8 @@ function BarrierHandler:update(dt)
     end
 
     for _, e in ipairs(self.pool) do
-        e.barrier.size = self.progress
+        e.road.bridgeRoadProgress = self.progress
     end
 end
 
-function BarrierHandler:MESSAGE_REQUEST_BARRIERS_STATE(_, data)
-    self.state = data.state
-end
-
-return BarrierHandler
+return BridgeHandler

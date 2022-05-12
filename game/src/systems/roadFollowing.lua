@@ -45,11 +45,27 @@ function RoadFollowing:update(dt)
 
         local distanceToNextFollower = e.roadFollower:distanceToNextFollower()
         if (distanceToNextFollower) then
-            local stoppingDistance = (e.roadFollower.velocity ^ 2) / (2 * e.roadFollower.deceleration) + 15
+            local stoppingDistance = (e.roadFollower.velocity ^ 2) / (2 * e.roadFollower.deceleration)
 
-            if (stoppingDistance > distanceToNextFollower) then
-                targetVelocity = 0
+            if (distanceToNextFollower - stoppingDistance < 30) then
+                e.roadFollower.isBrakingForFollower = true
             end
+        end
+
+        if (e.roadFollower.isBrakingForFollower) then
+            if (not distanceToNextFollower) then
+                e.roadFollower.isBrakingForFollower = false
+            else
+                local stoppingDistance = (e.roadFollower.velocity ^ 2) / (2 * e.roadFollower.deceleration)
+
+                if (distanceToNextFollower - stoppingDistance > 50) then
+                    e.roadFollower.isBrakingForFollower = false
+                end
+            end
+        end
+
+        if (e.roadFollower.isBrakingForFollower) then
+            targetVelocity = 0
         end
 
         local speed = e.roadFollower.velocity * dt
@@ -67,9 +83,42 @@ function RoadFollowing:update(dt)
 
         if (e.roadFollower.progress == 1) then
             if (e.roadFollower.path[road]) then
-                e.roadFollower:setRoad(e.roadFollower.path[road])
+                local newRoad = e.roadFollower.path[road]
+                e.roadFollower:setRoad(newRoad)
                 e.roadFollower.progress = 0
+
+                if (road.road.sensorId) then
+                    print(road.road.sensorId[1])
+                    print(road.road.sensorId[2])
+                end
+
+                if (newRoad.road.sensorId) then
+                    print(newRoad.road.sensorId[1])
+                    print(newRoad.road.sensorId[2])
+                end
+
+                if (
+                    road.road.sensorId == nil and newRoad.road.sensorId ~= nil or
+                    road.road.sensorId ~= nil and newRoad.road.sensorId == nil or
+                    (road.road.sensorId ~= nil and newRoad.road.sensorId ~= nil and
+                        ((road.road.sensorId[1] ~= newRoad.road.sensorId[1]) or (road.road.sensorId[2] ~= newRoad.road.sensorId[2]))
+                    )
+                ) then
+                    if (road.road.sensorId) then
+                        print("exit")
+                        self:getWorld():emit("ENTITY_EXITED_ZONE", road.road.sensorId[1], road.road.sensorId[2])
+                    end
+
+                    if (newRoad.road.sensorId) then
+                        print("enter")
+                        self:getWorld():emit("ENTITY_ENTERED_ZONE", newRoad.road.sensorId[1], newRoad.road.sensorId[2])
+                    end
+                end
             else
+                if (road.road.sensorId) then
+                    self:getWorld():emit("ENTITY_EXITED_ZONE", road.road.sensorId[1], road.road.sensorId[2])
+                end
+
                 e.roadFollower:setRoad(nil)
                 e:destroy()
             end
