@@ -87,16 +87,6 @@ function RoadFollowing:update(dt)
                 e.roadFollower:setRoad(newRoad)
                 e.roadFollower.progress = 0
 
-                if (road.road.sensorId) then
-                    print(road.road.sensorId[1])
-                    print(road.road.sensorId[2])
-                end
-
-                if (newRoad.road.sensorId) then
-                    print(newRoad.road.sensorId[1])
-                    print(newRoad.road.sensorId[2])
-                end
-
                 if (
                     road.road.sensorId == nil and newRoad.road.sensorId ~= nil or
                     road.road.sensorId ~= nil and newRoad.road.sensorId == nil or
@@ -105,12 +95,10 @@ function RoadFollowing:update(dt)
                     )
                 ) then
                     if (road.road.sensorId) then
-                        print("exit")
                         self:getWorld():emit("ENTITY_EXITED_ZONE", road.road.sensorId[1], road.road.sensorId[2])
                     end
 
                     if (newRoad.road.sensorId) then
-                        print("enter")
                         self:getWorld():emit("ENTITY_ENTERED_ZONE", newRoad.road.sensorId[1], newRoad.road.sensorId[2])
                     end
                 end
