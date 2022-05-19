@@ -12,6 +12,8 @@ Imgui = require("imgui")
 Vector = require("lib.vector")
 JSON = require("lib.json")
 
+SPAWN_CHANCE = 0.95
+
 local Systems = {}
 Assemblages = {}
 ECS.utils.loadNamespace("src/components")
@@ -156,6 +158,8 @@ function love.draw()
         editorSettings.directionsVisible = Imgui.Checkbox("Directions visible", editorSettings.directionsVisible)
         local phase = math.floor((love.timer.getTime() / 2) % 4) + 1
         Imgui.Text("Phase: "..phase)
+
+        SPAWN_CHANCE = Imgui.DragFloat("Spawn chance", SPAWN_CHANCE)
 
         local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size

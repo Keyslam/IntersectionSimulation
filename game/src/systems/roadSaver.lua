@@ -27,6 +27,7 @@ function RoadSaver:save()
             kind = curve.kind,
 
             spawnKind = e.spawner and e.spawner.kind,
+            spawnChance = e.spawner and e.spawner.spawnChance,
             id = e.id and e.id.value,
             sensorId = road.sensorId,
             isTunnel = road.isTunnel and true or false,

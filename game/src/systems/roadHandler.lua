@@ -37,7 +37,7 @@ function RoadHandler:MESSAGE_SET_AUTOMOBILE_ROUTE_STATE(_, data)
     handleSetRouteState(self, data)
 end
 
-function RoadHandler:MESSAGE_SET_BICYCLE_ROUTE_STATE(_, data)
+function RoadHandler:MESSAGE_SET_CYCLIST_ROUTE_STATE(_, data)
     handleSetRouteState(self, data)
 end
 

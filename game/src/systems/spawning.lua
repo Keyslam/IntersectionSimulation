@@ -21,7 +21,7 @@ function Spawning:update(dt)
         e.spawner.cooldown = e.spawner.cooldown - dt
 
         if (e.spawner.cooldown <= 0) then
-            if (love.math.random() > 0.95) then
+            if (love.math.random() > 1 - (e.spawner.spawnChance / 100)) then
                 local _e = ECS.entity(self:getWorld())
                 if (e.spawner.kind == "AUTOMOBILE") then
                     _e:assemble(Assemblages.car, e)

@@ -71,6 +71,10 @@ function RoadSettingsGuiRenderer:draw()
                 Imgui.EndCombo()
             end
 
+            if (e.spawner) then
+                e.spawner.spawnChance = Imgui.DragFloat("Spawn chance", e.spawner.spawnChance)
+            end
+
             if (changedFrom or changedTo) then
                 e.curve:updateBezier()
             end

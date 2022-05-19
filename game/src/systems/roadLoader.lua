@@ -17,6 +17,7 @@ function RoadLoader:load()
 
             if (roadData.spawnKind) then
                 e:give("spawner", roadData.spawnKind)
+                e.spawner.spawnChance = roadData.spawnChance or 0
             end
 
             e.road.isTunnel = roadData.isTunnel
