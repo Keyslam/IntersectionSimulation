@@ -2,6 +2,7 @@ require("src.debugHandler")
 
 local Camera = require("lib.camera")
 local RoadGraph = require("src.roadGraph")
+local HC = require("lib.hc")
 
 local Colors = require("src.colors")
 love.graphics.setBackgroundColor(Colors.background)
@@ -22,9 +23,10 @@ ECS.utils.loadNamespace("src/assemblages", Assemblages)
 
 local World = ECS.world()
 
+World:setResource("hc", HC.new(50))
 World:setResource("grid", {
     size = 50,
-    visible = true,
+    visible = false,
     map = {},
     connections = {}
 })
@@ -32,8 +34,8 @@ World:setResource("editorSettings", {
     preview = nil,
     drawing = false,
     roadKind = "STRAIGHT",
-    nodesVisible = true,
-    directionsVisible = true,
+    nodesVisible = false,
+    directionsVisible = false,
 })
 World:setResource("camera", Camera(1000, -200, 0.5))
 World:setResource("roadGraph", RoadGraph)
@@ -48,7 +50,7 @@ World:addSystems(
 
     Systems.gridRenderer,
     Systems.roadSelector,
-    Systems.roadNodePlacer,
+    -- Systems.roadNodePlacer,
 
     Systems.websocketHandler,
     Systems.websocketErrorHandler,
@@ -57,6 +59,7 @@ World:addSystems(
     Systems.spawning,
     Systems.roadFollowing,
     Systems.syncRoadToTransform,
+    Systems.syncTransformToCollider,
     -- Systems.sensorHandler,
 
     Systems.roadHandler,
@@ -114,10 +117,8 @@ end
 function love.update(dt)
     Imgui.NewFrame(true)
 
-    World:emit("update", dt/2)
-    World:emit("update", dt/2)
-    World:emit("update", dt/2)
-    World:emit("update", dt/2)
+    World:emit("update", dt)
+    World:emit("update", dt)
 end
 
 function love.draw()
@@ -125,6 +126,16 @@ function love.draw()
 
     camera:attach()
     World:emit("draw")
+
+    -- local hc = World:getResource("hc")
+    -- love.graphics.setColor(1, 1, 1, 0.1)
+    -- hc._hash:draw("line", false, true)
+
+    -- for _, shape in pairs(hc._hash:shapes()) do
+    --     love.graphics.setColor(1, 0, 0, 1)
+    --     shape:draw("line")
+    -- end
+
     camera:detach()
 
     local grid = World:getResource("grid")
@@ -156,10 +167,6 @@ function love.draw()
         grid.visible = Imgui.Checkbox("Grid visible", grid.visible)
         editorSettings.nodesVisible = Imgui.Checkbox("Nodes visible", editorSettings.nodesVisible)
         editorSettings.directionsVisible = Imgui.Checkbox("Directions visible", editorSettings.directionsVisible)
-        local phase = math.floor((love.timer.getTime() / 2) % 4) + 1
-        Imgui.Text("Phase: "..phase)
-
-        SPAWN_CHANCE = Imgui.DragFloat("Spawn chance", SPAWN_CHANCE)
 
         local mouseX, mouseY = camera:worldCoords(love.mouse.getPosition())
         mouseX = math.ceil((mouseX - grid.size/2) / grid.size) * grid.size

@@ -7,4 +7,5 @@ return function(e, road)
     :give("transform", {x = 0, y = 0}, 0)
     :give("shape", Shapes.bicycle)
     :give("color", Colors.bicycle)
+    :give("collider")
 end

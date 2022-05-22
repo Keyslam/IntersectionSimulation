@@ -64,6 +64,34 @@ function RoadFollowing:update(dt)
             end
         end
 
+        if (e.collider) then
+            local hc = self:getWorld():getResource("hc")
+
+            local shapeCollisions = hc:collisions(e.collider.shape)
+            local lookaheadCollisions = hc:collisions(e.collider.lookahead)
+
+            for otherShape, separating_vector in pairs(lookaheadCollisions) do
+                if (otherShape == e.collider.shape) then
+                    goto continue
+                end
+
+                if (otherShape.isBody) then
+                    local otherCollisions = hc:collisions(otherShape.entity.collider.shape)
+                    if (otherCollisions[e.collider.shape]) then
+                        if (otherShape.entity.roadFollower.id > e.roadFollower.id) then
+                            targetVelocity = 0
+                        end
+                    else
+                        targetVelocity = 0
+                    end
+
+                    goto continue
+                end
+
+                ::continue::
+            end
+        end
+
         if (e.roadFollower.isBrakingForFollower) then
             targetVelocity = 0
         end

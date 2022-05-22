@@ -1,5 +1,7 @@
 local RoadGraph = require("src.roadGraph")
 
+local id = 0
+
 local RoadFollower = ECS.component("roadFollower", function(e, road, maxVelocity, progress)
     e.road = nil
     e.progress = progress or 0
@@ -10,6 +12,9 @@ local RoadFollower = ECS.component("roadFollower", function(e, road, maxVelocity
 
     e.isBrakingForLight = false
     e.isBrakingForFollower = false
+
+    e.id = id
+    id = id + 1
 
     e.path = {}
 
